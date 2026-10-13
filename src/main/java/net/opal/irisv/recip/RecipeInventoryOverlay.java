@@ -216,6 +216,17 @@ public final class RecipeInventoryOverlay {
         if (recipePanelHidden) return;
 
         int favoriteHeaderX = layout.favoritesX;
+        boolean clickedRecipeSearch = event.getButton() == 0
+                && isHovering(event.getMouseX(), event.getMouseY(), layout.searchX, layout.searchY, layout.searchWidth, SEARCH_HEIGHT);
+        boolean clickedFavoriteSearch = event.getButton() == 0 && hasFavorites()
+                && isHovering(event.getMouseX(), event.getMouseY(), favoriteHeaderX, layout.favoritesY - 50, favoriteWidth(layout), 18);
+        if (event.getButton() == 0 && !clickedRecipeSearch && !clickedFavoriteSearch) {
+            // A click away from either search field returns keyboard control to the screen.
+            if (searchBox != null) searchBox.setFocused(false);
+            if (favoriteSearchBox != null) favoriteSearchBox.setFocused(false);
+            screen.setFocused(null);
+        }
+
         if (hasFavorites() && event.getButton() == 0 && isHovering(event.getMouseX(), event.getMouseY(), favoriteHeaderX, layout.favoritesY - 50, favoriteWidth(layout), 18)) {
             if (event.getMouseX() >= favoriteHeaderX + favoriteWidth(layout) - 14) favoriteSearchBox.setValue("");
             searchBox.setFocused(false);
@@ -425,9 +436,11 @@ public final class RecipeInventoryOverlay {
         }
         if (event.getKeyCode() == org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) return;
         EditBox focused = favoriteSearchBox != null && favoriteSearchBox.isFocused() ? favoriteSearchBox : searchBox;
-        if (focused.keyPressed(event.getKeyCode(), event.getScanCode(), event.getModifiers())) {
-            event.setCanceled(true);
-        }
+        focused.keyPressed(event.getKeyCode(), event.getScanCode(), event.getModifiers());
+        // Consume every non-Escape key while a search field owns focus. Some keys (notably E)
+        // produce their character in CharacterTyped rather than EditBox#keyPressed, but would
+        // otherwise still reach InventoryScreen and trigger its close-key binding.
+        event.setCanceled(true);
     }
 
     static boolean handleRecipeKey(Screen screen, ItemStack stack, int key, int scan) {

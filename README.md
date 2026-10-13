@@ -2,7 +2,7 @@
 
 Catalogue d'objets, recettes, favoris et informations en jeu pour Minecraft.
 
-**Minecraft 1.21.1 · NeoForge 21.1.248 · Java 21 · 1.0.0**
+**Minecraft 1.21.1 · NeoForge 21.1.248 · Java 21 · 1.0.1**
 
 [Français](#français) | [English](#english)
 
@@ -36,7 +36,7 @@ Les interactions et raccourcis sont documentés dans le Wiki en jeu. Les touches
 
 1. Préparer une instance **Minecraft 1.21.1 avec NeoForge 21.1.248** et Java 21.
 2. Compiler le projet ou utiliser un JAR obtenu auprès d'une source autorisée.
-3. Placer `irisv-1.0.0.jar` dans le dossier `mods` de l'instance.
+3. Placer `irisv-1.0.1.jar` dans le dossier `mods` de l'instance.
 4. Lancer le jeu et ouvrir **IrisV Options** depuis le menu principal.
 
 Pour une installation multijoueur, prévoir IrisV sur le client et le serveur : le mod déclare un canal réseau pour les données des tooltips. Ne pas le considérer comme un mod exclusivement client.
@@ -51,7 +51,7 @@ Depuis la racine du dépôt, dans PowerShell :
 .\gradlew.bat build
 ```
 
-Le build compile le code et exécute les tests. Le JAR est produit dans `build/libs/irisv-1.0.0.jar` ; son nom suit `mod_id` et `mod_version` dans `gradle.properties`.
+Le build compile le code et exécute les tests. Le JAR est produit dans `build/libs/irisv-1.0.1.jar` ; son nom suit `mod_id` et `mod_version` dans `gradle.properties`.
 
 | Commande PowerShell | Usage |
 | --- | --- |
@@ -128,7 +128,7 @@ Build from the repository root:
 .\gradlew.bat build
 ```
 
-The wrapper supplies Gradle 9.2.1. The first run requires network access to download dependencies and Minecraft resources. Output: `build/libs/irisv-1.0.0.jar`; the filename follows `mod_id` and `mod_version`.
+The wrapper supplies Gradle 9.2.1. The first run requires network access to download dependencies and Minecraft resources. Output: `build/libs/irisv-1.0.1.jar`; the filename follows `mod_id` and `mod_version`.
 
 Use `runClient` or `runServer` for development, `test` for automated tests, and `runData` for data generation. On Linux/macOS, use `./gradlew` instead of `.\gradlew.bat`. Server administrators must accept Minecraft's EULA before running a server.
 
