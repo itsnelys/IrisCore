@@ -20,6 +20,7 @@ public final class BackItemLayer extends RenderLayer<AbstractClientPlayer, Playe
                        float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
         var player = Minecraft.getInstance().player;
         if (player == null || renderedPlayer != player) return;
+        if (isHiddenByContext(player)) return;
 
         ItemStack stack = BackItemManager.getBackItem(player.getUUID());
         if (stack.isEmpty() || ItemStack.isSameItem(player.getMainHandItem(), stack)
@@ -29,5 +30,14 @@ public final class BackItemLayer extends RenderLayer<AbstractClientPlayer, Playe
         // crouching torso rotation instead of remaining upright in world space.
         getParentModel().body.translateAndRotate(poseStack);
         BackItemRenderer.render(stack, poseStack, buffer, packedLight, renderedPlayer.isCrouching());
+    }
+
+    /** Hides only the visual layer; the selected BackItem and its protection stay intact. */
+    private static boolean isHiddenByContext(AbstractClientPlayer player) {
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.options.getCameraType().isFirstPerson()
+                || player.isSwimming()
+                || player.isFallFlying()
+                || player.isInvisible();
     }
 }

@@ -33,6 +33,8 @@ public class ConfigOptions {
     public boolean enableRecipeOverlay = true;
     public boolean enableIndicators = true;
     public boolean enableBackItems = true;
+    /** Extra item ids allowed as BackItems, for example "modid:greatsword". */
+    public List<String> backItemWhitelist = new ArrayList<>();
     public boolean enableToolDurabilityIndicator = true;
     public boolean showDurabilityDetails = true;
     public IndicatorPosition indicatorPosition = IndicatorPosition.RIGHT;
@@ -125,6 +127,7 @@ public class ConfigOptions {
         options.enableRecipeOverlay = readBoolean(root, "enableRecipeOverlay", options.enableRecipeOverlay);
         options.enableIndicators = readBoolean(root, "enableIndicators", options.enableIndicators);
         options.enableBackItems = readBoolean(root, "enableBackItems", options.enableBackItems);
+        options.backItemWhitelist = readStringList(root, "backItemWhitelist");
         options.enableToolDurabilityIndicator = readBoolean(root, "enableToolDurabilityIndicator", options.enableToolDurabilityIndicator);
         options.showDurabilityDetails = readBoolean(root, "showDurabilityDetails", options.showDurabilityDetails);
         options.enableEntityTooltip = readBoolean(root, "enableEntityTooltip", options.enableEntityTooltip);
@@ -158,6 +161,9 @@ public class ConfigOptions {
         root.addProperty("enableRecipeOverlay", enableRecipeOverlay);
         root.addProperty("enableIndicators", enableIndicators);
         root.addProperty("enableBackItems", enableBackItems);
+        JsonArray backItems = new JsonArray();
+        for (String itemId : backItemWhitelist) backItems.add(itemId);
+        root.add("backItemWhitelist", backItems);
         root.addProperty("enableToolDurabilityIndicator", enableToolDurabilityIndicator);
         root.addProperty("showDurabilityDetails", showDurabilityDetails);
         root.addProperty("indicatorPosition", indicatorPosition.name());
