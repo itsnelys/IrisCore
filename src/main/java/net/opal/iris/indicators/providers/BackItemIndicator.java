@@ -8,17 +8,24 @@ import net.opal.iris.api.IIndicator;
 import net.opal.iris.client.backitem.BackItemManager;
 import net.opal.iris.option.ConfigOptions;
 
-/** Displays the item explicitly attached to the player's back with Shift+B. */
+/** Displays the current eligible BackItem and its durability in the HUD. */
 public final class BackItemIndicator implements IIndicator {
     @Override
     public boolean isVisible() {
         var player = Minecraft.getInstance().player;
-        return player != null
-                && !player.isSpectator()
-                && ConfigOptions.getInstance().enableIndicators
-                && ConfigOptions.getInstance().enableBackItems
-                && BackItemManager.isBackItemLocked(player.getUUID())
-                && !BackItemManager.getBackItem(player.getUUID()).isEmpty();
+        if (player == null
+                || player.isSpectator()
+                || !ConfigOptions.getInstance().enableIndicators
+                || !ConfigOptions.getInstance().enableBackItems) return false;
+
+        ItemStack stack = BackItemManager.getLiveBackItem(player);
+        if (stack.isEmpty()) return false;
+
+        // A locked item should leave the HUD while it is actively held, just as
+        // it leaves the player's back model. Automatically tracked items stay visible.
+        return !BackItemManager.isBackItemLocked(player.getUUID())
+                || (!ItemStack.isSameItem(player.getMainHandItem(), stack)
+                && !ItemStack.isSameItem(player.getOffhandItem(), stack));
     }
 
     @Override
@@ -30,6 +37,10 @@ public final class BackItemIndicator implements IIndicator {
         ItemStack stack = BackItemManager.getLiveBackItem(player);
         if (stack.isEmpty()) return;
 
+        // Isolate this indicator's render batch, otherwise alpha changes can be
+        // ignored by already queued HUD geometry.
+        gui.flush();
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         renderDurabilityState(minecraft, stack, partialTick);
         gui.renderItem(stack, x, y);
         gui.renderItemDecorations(minecraft.font, stack, x, y);
