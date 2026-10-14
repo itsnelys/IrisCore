@@ -14,6 +14,7 @@ import java.util.UUID;
 /** Maintains the local client-side item rendered on a player's back. */
 public final class BackItemManager {
     private static final Map<UUID, ItemStack> BACK_ITEMS = new HashMap<>();
+    private static final Map<UUID, ItemStack> LOCKED_BACK_ITEMS = new HashMap<>();
     private static ItemStack observedMainHand = ItemStack.EMPTY;
 
     private BackItemManager() {}
@@ -32,6 +33,11 @@ public final class BackItemManager {
         ItemStack displayedBackItem = getBackItem(player.getUUID());
         if (!displayedBackItem.isEmpty() && !isStillInInventory(player, displayedBackItem)) {
             setBackItem(player.getUUID(), ItemStack.EMPTY);
+            ItemStack lockedBackItem = LOCKED_BACK_ITEMS.get(player.getUUID());
+            if (ItemStack.isSameItemSameComponents(displayedBackItem, lockedBackItem)) {
+                LOCKED_BACK_ITEMS.remove(player.getUUID());
+                FunctionUtilsChat.clientAction(player, "iris.back_items.lock_removed", displayedBackItem.getHoverName());
+            }
             FunctionUtilsChat.clientAction(player, "iris.back_items.removed", displayedBackItem.getHoverName());
         }
 
@@ -40,11 +46,39 @@ public final class BackItemManager {
 
         // Keep the item that was just put away. The active item is never drawn
         // on the back by the render layer, so switching tools exposes the last one.
-        if (!observedMainHand.isEmpty() && BackItemWhitelist.isWhitelisted(observedMainHand.getItem())) {
+        if (!isLocked(player.getUUID()) && !observedMainHand.isEmpty()
+                && BackItemWhitelist.isWhitelisted(observedMainHand.getItem())) {
             setBackItem(player.getUUID(), observedMainHand);
             FunctionUtilsChat.clientAction(player, "iris.back_items.tracked", observedMainHand.getHoverName());
         }
         observedMainHand = currentMainHand.copy();
+    }
+
+    /** Locks or unlocks the held eligible item as the local player's preferred back item. */
+    public static void toggleLockedMainHand() {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null || !ConfigOptions.getInstance().enableBackItems) return;
+
+        UUID playerId = player.getUUID();
+        ItemStack heldItem = player.getMainHandItem();
+        ItemStack lockedItem = LOCKED_BACK_ITEMS.getOrDefault(playerId, ItemStack.EMPTY);
+        if (!lockedItem.isEmpty() && ItemStack.isSameItemSameComponents(lockedItem, heldItem)) {
+            LOCKED_BACK_ITEMS.remove(playerId);
+            setBackItem(playerId, ItemStack.EMPTY);
+            FunctionUtilsChat.clientAction(player, "iris.back_items.unlocked", heldItem.getHoverName());
+            return;
+        }
+
+        if (heldItem.isEmpty() || !BackItemWhitelist.isWhitelisted(heldItem.getItem())) {
+            FunctionUtilsChat.clientAction(player, "iris.back_items.lock_invalid");
+            return;
+        }
+
+        ItemStack lock = heldItem.copy();
+        LOCKED_BACK_ITEMS.put(playerId, lock);
+        setBackItem(playerId, lock);
+        observedMainHand = lock.copy();
+        FunctionUtilsChat.clientAction(player, "iris.back_items.locked", lock.getHoverName());
     }
 
     public static void setBackItem(UUID playerId, ItemStack stack) {
@@ -58,6 +92,11 @@ public final class BackItemManager {
 
     public static void clear() {
         BACK_ITEMS.clear();
+        LOCKED_BACK_ITEMS.clear();
+    }
+
+    private static boolean isLocked(UUID playerId) {
+        return LOCKED_BACK_ITEMS.containsKey(playerId);
     }
 
     private static boolean isStillInInventory(LocalPlayer player, ItemStack expected) {
