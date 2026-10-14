@@ -21,11 +21,11 @@ public final class BackItemIndicator implements IIndicator {
         ItemStack stack = BackItemManager.getLiveBackItem(player);
         if (stack.isEmpty()) return false;
 
-        // A locked item should leave the HUD while it is actively held, just as
-        // it leaves the player's back model. Automatically tracked items stay visible.
-        return !BackItemManager.isBackItemLocked(player.getUUID())
-                || (!ItemStack.isSameItemSameComponents(player.getMainHandItem(), stack)
-                && !ItemStack.isSameItemSameComponents(player.getOffhandItem(), stack));
+        // The same stack cannot be displayed as both a held-item indicator and
+        // a BackItem indicator. This applies to manual Shift+B locks and the
+        // automatically tracked last-held item alike.
+        return !ItemStack.isSameItemSameComponents(player.getMainHandItem(), stack)
+                && !ItemStack.isSameItemSameComponents(player.getOffhandItem(), stack);
     }
 
     @Override
