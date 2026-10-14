@@ -1,24 +1,35 @@
 package net.opal.iris.menu;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.opal.iris.option.ConfigOptions;
 import net.opal.iris.theme.UiTheme;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Dedicated, in-game configuration page for visual BackItems settings. */
 public final class BackItemsOptionsScreen extends Screen {
     private static final int BUTTON_HEIGHT = 20;
     private static final int GAP = 4;
+    private static final int CONTENT_TOP = 42;
+    private static final int CONTENT_BOTTOM = 305;
 
     private final Screen parent;
+    private final List<AbstractWidget> contentWidgets = new ArrayList<>();
+    private final Map<AbstractWidget, Integer> contentBaseY = new IdentityHashMap<>();
     private EditBox whitelistField;
+    private Button returnButton;
+    private int contentScroll;
 
     public BackItemsOptionsScreen(Screen parent) {
         super(Component.translatable("menu.iris.back_items.title"));
@@ -32,26 +43,26 @@ public final class BackItemsOptionsScreen extends Screen {
         int left = (width - panelWidth) / 2;
         int half = (panelWidth - GAP) / 2;
 
-        addRenderableWidget(toggleButton(left, 50, panelWidth, "menu.iris.back_items", config.enableBackItems,
+        addContentWidget(toggleButton(left, 50, panelWidth, "menu.iris.back_items", config.enableBackItems,
                 enabled -> config.enableBackItems = enabled));
 
-        addRenderableWidget(toggleButton(left, 105, half, "menu.iris.back_items.first_person", config.hideBackItemsInFirstPerson,
+        addContentWidget(toggleButton(left, 105, half, "menu.iris.back_items.first_person", config.hideBackItemsInFirstPerson,
                 enabled -> config.hideBackItemsInFirstPerson = enabled));
-        addRenderableWidget(toggleButton(left + half + GAP, 105, half, "menu.iris.back_items.swimming", config.hideBackItemsWhileSwimming,
+        addContentWidget(toggleButton(left + half + GAP, 105, half, "menu.iris.back_items.swimming", config.hideBackItemsWhileSwimming,
                 enabled -> config.hideBackItemsWhileSwimming = enabled));
-        addRenderableWidget(toggleButton(left, 130, half, "menu.iris.back_items.elytra", config.hideBackItemsWhileFallFlying,
+        addContentWidget(toggleButton(left, 130, half, "menu.iris.back_items.elytra", config.hideBackItemsWhileFallFlying,
                 enabled -> config.hideBackItemsWhileFallFlying = enabled));
-        addRenderableWidget(toggleButton(left + half + GAP, 130, half, "menu.iris.back_items.invisible", config.hideBackItemsWhenInvisible,
+        addContentWidget(toggleButton(left + half + GAP, 130, half, "menu.iris.back_items.invisible", config.hideBackItemsWhenInvisible,
                 enabled -> config.hideBackItemsWhenInvisible = enabled));
-        addRenderableWidget(toggleButton(left, 155, half, "menu.iris.back_items.crouching", config.hideBackItemsWhileCrouching,
+        addContentWidget(toggleButton(left, 155, half, "menu.iris.back_items.crouching", config.hideBackItemsWhileCrouching,
                 enabled -> config.hideBackItemsWhileCrouching = enabled));
-        addRenderableWidget(toggleButton(left + half + GAP, 155, half, "menu.iris.back_items.riding", config.hideBackItemsWhileRiding,
+        addContentWidget(toggleButton(left + half + GAP, 155, half, "menu.iris.back_items.riding", config.hideBackItemsWhileRiding,
                 enabled -> config.hideBackItemsWhileRiding = enabled));
-        addRenderableWidget(toggleButton(left, 180, half, "menu.iris.back_items.spectator", config.hideBackItemsInSpectator,
+        addContentWidget(toggleButton(left, 180, half, "menu.iris.back_items.spectator", config.hideBackItemsInSpectator,
                 enabled -> config.hideBackItemsInSpectator = enabled));
-        addRenderableWidget(toggleButton(left + half + GAP, 180, half, "menu.iris.back_items.sleeping", config.hideBackItemsWhileSleeping,
+        addContentWidget(toggleButton(left + half + GAP, 180, half, "menu.iris.back_items.sleeping", config.hideBackItemsWhileSleeping,
                 enabled -> config.hideBackItemsWhileSleeping = enabled));
-        addRenderableWidget(toggleButton(left, 205, panelWidth, "menu.iris.back_items.cape", config.hideBackItemsWithCape,
+        addContentWidget(toggleButton(left, 205, panelWidth, "menu.iris.back_items.cape", config.hideBackItemsWithCape,
                 enabled -> config.hideBackItemsWithCape = enabled));
 
         whitelistField = new EditBox(font, left, 260, panelWidth, BUTTON_HEIGHT,
@@ -59,19 +70,20 @@ public final class BackItemsOptionsScreen extends Screen {
         whitelistField.setMaxLength(1024);
         whitelistField.setValue(String.join(", ", config.backItemWhitelist));
         whitelistField.setHint(Component.translatable("menu.iris.back_items.whitelist_hint"));
-        addRenderableWidget(whitelistField);
+        addContentWidget(whitelistField);
 
-        addRenderableWidget(Button.builder(Component.translatable("menu.iris.back_items.save_whitelist"), button -> saveWhitelist())
+        addContentWidget(Button.builder(Component.translatable("menu.iris.back_items.save_whitelist"), button -> saveWhitelist())
                 .bounds(left, 285, panelWidth, BUTTON_HEIGHT).build());
-        addRenderableWidget(Button.builder(Component.translatable("menu.iris.return"), button -> onClose())
+        returnButton = addRenderableWidget(Button.builder(Component.translatable("menu.iris.return"), button -> onClose())
                 .bounds(left, height - 30, panelWidth, BUTTON_HEIGHT).build());
+        contentScroll = Mth.clamp(contentScroll, 0, maxContentScroll());
+        updateContentPositions();
     }
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         UiTheme theme = UiTheme.getCurrent();
         graphics.fill(0, 0, width, height, theme.gui_bgOverlay());
-        super.render(graphics, mouseX, mouseY, partialTicks);
 
         graphics.fill(0, 0, width, 35, theme.gui_barColor());
         graphics.fill(0, 34, width, 35, theme.gui_lineColor());
@@ -79,8 +91,25 @@ public final class BackItemsOptionsScreen extends Screen {
         graphics.drawCenteredString(font, Component.literal("§l").append(title), width / 2, 12, 0xFFFFFF);
         int panelWidth = Math.min(320, Math.max(180, width - 36));
         int left = (width - panelWidth) / 2;
-        section(graphics, theme, "menu.iris.back_items.visibility", left, 83, panelWidth);
-        section(graphics, theme, "menu.iris.back_items.mod_items", left, 238, panelWidth);
+        int footerY = footerY();
+        graphics.enableScissor(0, CONTENT_TOP, width, footerY);
+        section(graphics, theme, "menu.iris.back_items.visibility", left, 83 - contentScroll, panelWidth);
+        section(graphics, theme, "menu.iris.back_items.mod_items", left, 238 - contentScroll, panelWidth);
+        super.render(graphics, mouseX, mouseY, partialTicks);
+        graphics.disableScissor();
+        returnButton.render(graphics, mouseX, mouseY, partialTicks);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (mouseY < CONTENT_TOP || mouseY > footerY()) return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        int previous = contentScroll;
+        contentScroll = Mth.clamp(contentScroll - (int) (scrollY * 20), 0, maxContentScroll());
+        if (contentScroll != previous) {
+            updateContentPositions();
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     @Override
@@ -98,6 +127,25 @@ public final class BackItemsOptionsScreen extends Screen {
             ConfigOptions.getInstance().save();
             button.setMessage(label(key, enabled));
         }).bounds(x, y, buttonWidth, BUTTON_HEIGHT).build();
+    }
+
+    private <T extends AbstractWidget> T addContentWidget(T widget) {
+        contentWidgets.add(widget);
+        contentBaseY.put(widget, widget.getY());
+        return addRenderableWidget(widget);
+    }
+
+    private void updateContentPositions() {
+        int footerY = footerY();
+        for (AbstractWidget widget : contentWidgets) {
+            int y = contentBaseY.get(widget) - contentScroll;
+            widget.setY(y);
+            widget.visible = y >= CONTENT_TOP && y + widget.getHeight() <= footerY;
+        }
+    }
+
+    private int maxContentScroll() {
+        return Math.max(0, CONTENT_BOTTOM - footerY());
     }
 
     private void saveWhitelist() {
@@ -123,7 +171,7 @@ public final class BackItemsOptionsScreen extends Screen {
     }
 
     private void renderFooter(GuiGraphics graphics, UiTheme theme) {
-        int footerY = height - 40;
+        int footerY = footerY();
         int panelWidth = Math.min(320, Math.max(180, width - 36));
         int left = (width - panelWidth) / 2;
         int right = left + panelWidth;
@@ -134,5 +182,9 @@ public final class BackItemsOptionsScreen extends Screen {
         graphics.fill(left, footerY, right, height - 30, theme.gui_barColor());
         graphics.fill(left, footerY, right, footerY + 1, theme.gui_lineColor());
         graphics.fill(left, height - 10, right, height, theme.gui_barColor());
+    }
+
+    private int footerY() {
+        return height - 40;
     }
 }
