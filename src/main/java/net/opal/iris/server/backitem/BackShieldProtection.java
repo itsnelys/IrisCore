@@ -72,9 +72,17 @@ public final class BackShieldProtection {
     }
 
     private static ItemStack findInventoryStack(ServerPlayer player, ItemStack expected) {
+        // A lock is created while the shield is still held. Include both hands
+        // so the server accepts it before the player switches to another item.
+        if (sameStack(player.getMainHandItem(), expected)) return player.getMainHandItem();
+        if (sameStack(player.getOffhandItem(), expected)) return player.getOffhandItem();
         for (ItemStack candidate : player.getInventory().items) {
-            if (candidate != null && ItemStack.isSameItemSameComponents(candidate, expected)) return candidate;
+            if (sameStack(candidate, expected)) return candidate;
         }
         return ItemStack.EMPTY;
+    }
+
+    private static boolean sameStack(ItemStack first, ItemStack second) {
+        return first != null && second != null && ItemStack.isSameItemSameComponents(first, second);
     }
 }
