@@ -9,5 +9,12 @@ plugins {
 }
 
 rootProject.name = 'IrisCore'
-include(':irisVision')
-project(':irisVision').projectDir = file('../IrisVision')
+
+// IrisVision is a separately cloned companion project. Include it for local
+// development when it is available, but keep IrisCore independently buildable
+// in a fresh GitHub Actions checkout.
+def irisVisionDirectory = file('../IrisVision')
+if (irisVisionDirectory.isDirectory()) {
+    include(':irisVision')
+    project(':irisVision').projectDir = irisVisionDirectory
+}
