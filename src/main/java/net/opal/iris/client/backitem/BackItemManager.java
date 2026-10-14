@@ -39,7 +39,7 @@ public final class BackItemManager {
         if (!displayedBackItem.isEmpty() && !isStillInInventory(player, displayedBackItem)) {
             setBackItem(player.getUUID(), ItemStack.EMPTY);
             ItemStack lockedBackItem = LOCKED_BACK_ITEMS.get(player.getUUID());
-            if (sameStack(displayedBackItem, lockedBackItem)) {
+            if (sameTrackedItem(displayedBackItem, lockedBackItem)) {
                 LOCKED_BACK_ITEMS.remove(player.getUUID());
                 FunctionUtilsChat.clientAction(player, "iris.back_items.lock_removed", displayedBackItem.getHoverName());
             }
@@ -47,7 +47,7 @@ public final class BackItemManager {
         }
 
         ItemStack currentMainHand = player.getMainHandItem();
-        if (sameStack(currentMainHand, observedMainHand)) return;
+        if (sameTrackedItem(currentMainHand, observedMainHand)) return;
 
         // Keep the item that was just put away. The active item is never drawn
         // on the back by the render layer, so switching tools exposes the last one.
@@ -67,7 +67,7 @@ public final class BackItemManager {
         UUID playerId = player.getUUID();
         ItemStack heldItem = player.getMainHandItem();
         ItemStack lockedItem = LOCKED_BACK_ITEMS.getOrDefault(playerId, ItemStack.EMPTY);
-        if (!lockedItem.isEmpty() && sameStack(lockedItem, heldItem)) {
+        if (!lockedItem.isEmpty() && sameTrackedItem(lockedItem, heldItem)) {
             LOCKED_BACK_ITEMS.remove(playerId);
             setBackItem(playerId, ItemStack.EMPTY);
             FunctionUtilsChat.clientAction(player, "iris.back_items.unlocked", heldItem.getHoverName());
@@ -122,13 +122,20 @@ public final class BackItemManager {
 
     private static boolean isStillInInventory(LocalPlayer player, ItemStack expected) {
         for (ItemStack candidate : player.getInventory().items) {
-            if (sameStack(candidate, expected)) return true;
+            if (sameTrackedItem(candidate, expected)) return true;
         }
-        return sameStack(player.getMainHandItem(), expected) || sameStack(player.getOffhandItem(), expected);
+        return sameTrackedItem(player.getMainHandItem(), expected)
+                || sameTrackedItem(player.getOffhandItem(), expected);
     }
 
-    private static boolean sameStack(ItemStack first, ItemStack second) {
-        return first != null && second != null && ItemStack.isSameItemSameComponents(first, second);
+    /**
+     * A tool's durability changes while it is used. BackItems therefore tracks
+     * its item identity, rather than treating a changed damage component as a
+     * different item that should be detached.
+     */
+    private static boolean sameTrackedItem(ItemStack first, ItemStack second) {
+        return first != null && second != null && !first.isEmpty() && !second.isEmpty()
+                && ItemStack.isSameItem(first, second);
     }
 
 }

@@ -22,8 +22,8 @@ public final class BackItemLayer extends RenderLayer<AbstractClientPlayer, Playe
         if (player == null || renderedPlayer != player) return;
 
         ItemStack stack = BackItemManager.getBackItem(player.getUUID());
-        if (stack.isEmpty() || ItemStack.isSameItemSameComponents(player.getMainHandItem(), stack)
-                || ItemStack.isSameItemSameComponents(player.getOffhandItem(), stack)) return;
+        if (stack.isEmpty() || ItemStack.isSameItem(player.getMainHandItem(), stack)
+                || ItemStack.isSameItem(player.getOffhandItem(), stack)) return;
 
         // Attach the item to the body model so the back item inherits the
         // crouching torso rotation instead of remaining upright in world space.
