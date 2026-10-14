@@ -20,8 +20,8 @@ import java.util.UUID;
 /** Server-side rear-only shield blocking for an eligible shield displayed as a BackItem. */
 public final class BackShieldProtection {
     private static final double REAR_BLOCK_DOT_PRODUCT = -0.5D;
-    /** Back protection is passive, so each armor-timed block costs three durability points. */
-    private static final int BACK_SHIELD_DURABILITY_COST = 3;
+    /** Vanilla shield durability cost: one point for each blocked damage window. */
+    private static final int BACK_SHIELD_DURABILITY_COST = 1;
     private static final Map<UUID, ItemStack> LOCKED_SHIELDS = new HashMap<>();
 
     private BackShieldProtection() {}
