@@ -100,6 +100,23 @@ public final class BackItemManager {
         return BACK_ITEMS.getOrDefault(playerId, ItemStack.EMPTY);
     }
 
+    /**
+     * Resolves the tracked item to its live inventory stack. A BackItem is stored
+     * as a copy for rendering, while durability damage changes the real stack.
+     */
+    public static ItemStack getLiveBackItem(LocalPlayer player) {
+        if (player == null) return ItemStack.EMPTY;
+
+        ItemStack trackedItem = getBackItem(player.getUUID());
+        if (trackedItem.isEmpty()) return ItemStack.EMPTY;
+        if (sameTrackedItem(player.getMainHandItem(), trackedItem)) return player.getMainHandItem();
+        if (sameTrackedItem(player.getOffhandItem(), trackedItem)) return player.getOffhandItem();
+        for (ItemStack candidate : player.getInventory().items) {
+            if (sameTrackedItem(candidate, trackedItem)) return candidate;
+        }
+        return trackedItem;
+    }
+
     /** Returns whether the player's displayed back item was explicitly selected with Shift+B. */
     public static boolean isBackItemLocked(UUID playerId) {
         return isLocked(playerId);

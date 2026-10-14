@@ -25,7 +25,10 @@ public final class BackShieldProtection {
      * block. ItemStack.hurtAndBreak still applies Minecraft's Unbreaking handling.
      */
     private static final int BACK_SHIELD_DURABILITY_COST = 3;
+    /** Prevents a cluster of entities from charging several shield blocks at once. */
+    private static final long BLOCK_RECOVERY_TICKS = 5L;
     private static final Map<UUID, ItemStack> LOCKED_SHIELDS = new HashMap<>();
+    private static final Map<UUID, Long> LAST_BLOCK_TICKS = new HashMap<>();
 
     private BackShieldProtection() {}
 
@@ -34,6 +37,7 @@ public final class BackShieldProtection {
                 || !BackItemWhitelist.isWhitelisted(requestedStack.getItem())
                 || findInventoryStack(player, requestedStack).isEmpty()) {
             LOCKED_SHIELDS.remove(player.getUUID());
+            LAST_BLOCK_TICKS.remove(player.getUUID());
             return;
         }
         LOCKED_SHIELDS.put(player.getUUID(), requestedStack.copy());
@@ -49,6 +53,7 @@ public final class BackShieldProtection {
         ItemStack shield = findInventoryStack(player, lockedShield);
         if (shield.isEmpty()) {
             LOCKED_SHIELDS.remove(player.getUUID());
+            LAST_BLOCK_TICKS.remove(player.getUUID());
             return;
         }
         if (ItemStack.isSameItemSameComponents(player.getMainHandItem(), lockedShield)
@@ -59,11 +64,17 @@ public final class BackShieldProtection {
         if (attacker == null || attacker == player || !isBehind(player, attacker)) return;
 
         event.setCanceled(true);
+        long gameTime = player.level().getGameTime();
+        long lastBlockTick = LAST_BLOCK_TICKS.getOrDefault(player.getUUID(), -BLOCK_RECOVERY_TICKS);
+        if (gameTime - lastBlockTick < BLOCK_RECOVERY_TICKS) return;
+
+        LAST_BLOCK_TICKS.put(player.getUUID(), gameTime);
         shield.hurtAndBreak(BACK_SHIELD_DURABILITY_COST, player, net.minecraft.world.entity.EquipmentSlot.OFFHAND);
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 1.0F, 0.8F);
         if (shield.isEmpty()) {
             LOCKED_SHIELDS.remove(player.getUUID());
+            LAST_BLOCK_TICKS.remove(player.getUUID());
             PacketDistributor.sendToPlayer(player, new BackItemDetachPayload());
         } else {
             // Damage changes the stack components. Keep the server-side reference

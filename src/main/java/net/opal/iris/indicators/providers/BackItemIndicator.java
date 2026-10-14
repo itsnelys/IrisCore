@@ -27,7 +27,7 @@ public final class BackItemIndicator implements IIndicator {
         var player = minecraft.player;
         if (player == null) return;
 
-        ItemStack stack = BackItemManager.getBackItem(player.getUUID());
+        ItemStack stack = BackItemManager.getLiveBackItem(player);
         if (stack.isEmpty()) return;
 
         renderDurabilityState(minecraft, stack, partialTick);
