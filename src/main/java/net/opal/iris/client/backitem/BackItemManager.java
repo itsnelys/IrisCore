@@ -111,9 +111,11 @@ public final class BackItemManager {
         if (player == null) return;
 
         ItemStack lockedItem = LOCKED_BACK_ITEMS.remove(player.getUUID());
-        if (lockedItem == null || lockedItem.isEmpty()) return;
+        ItemStack displayedItem = getBackItem(player.getUUID());
+        ItemStack detachedItem = lockedItem == null || lockedItem.isEmpty() ? displayedItem : lockedItem;
+        if (detachedItem.isEmpty()) return;
         setBackItem(player.getUUID(), ItemStack.EMPTY);
-        FunctionUtilsChat.clientAction(player, "iris.back_items.shield_detached", lockedItem.getHoverName());
+        FunctionUtilsChat.clientAction(player, "iris.back_items.shield_detached", detachedItem.getHoverName());
     }
 
     private static boolean isLocked(UUID playerId) {
