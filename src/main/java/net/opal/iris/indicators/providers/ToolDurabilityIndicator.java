@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShieldItem;
 import net.opal.iris.api.IIndicator;
 import net.opal.iris.option.ConfigOptions;
 
@@ -66,27 +65,17 @@ public class ToolDurabilityIndicator implements IIndicator {
         float ratio = getDurabilityRatio(stack);
         int remaining = stack.getMaxDamage() - stack.getDamageValue();
         boolean shouldPulse = ratio <= 0.10F;
-        float alphaPulse = 1.0F;
 
         if (shouldPulse && mc.player != null) {
             float speed = ratio <= 0.05F ? 1.2F : 0.6F;
             float time = (mc.player.tickCount + partialTick) * speed;
-            alphaPulse = 0.5F + (float) Math.sin(time) * 0.35F;
+            float alphaPulse = 0.5F + (float) Math.sin(time) * 0.35F;
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alphaPulse);
         }
 
         gui.renderItem(stack, x, y);
         gui.renderItemDecorations(mc.font, stack, x, y);
         gui.flush();
-
-        // Shield models reset their own shader colour and ignore the alpha used
-        // above. A black alpha overlay recreates that same smooth pulse without
-        // changing its phase or speed relative to armor and weapon icons.
-        if (shouldPulse && stack.getItem() instanceof ShieldItem) {
-            int shadeAlpha = Math.round((1.0F - alphaPulse) * 180.0F);
-            gui.fill(x, y, x + 16, y + 16, shadeAlpha << 24);
-            gui.flush();
-        }
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         if (!ConfigOptions.getInstance().showDurabilityDetails) return y + 18;
