@@ -5,7 +5,7 @@ plugins {
     id 'idea'
 }
 
-tasks.named('wrapper', Wrapper).configure {
+tasks.withType(Wrapper).configureEach {
     // Define wrapper values here so as to not have to always do so when updating gradlew.properties.
     // Switching this to Wrapper.DistributionType.ALL will download the full gradle sources that comes with
     // documentation attached on cursor hover of gradle classes and methods. However, this comes with increased
@@ -27,6 +27,22 @@ base {
 
 // Minecraft 1.21.x runs on Java 21, so mods should target Java 21.
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+// IrisVision is loaded with IrisCore in the root development run used by IntelliJ.
+project(':irisVision') {
+    ext.set('parchment_minecraft_version', '1.21.1')
+    ext.set('parchment_mappings_version', '2024.11.17')
+    ext.set('minecraft_version', '1.21.1')
+    ext.set('minecraft_version_range', '[1.21.1]')
+    ext.set('neo_version', '21.1.248')
+    ext.set('loader_version_range', '[1,)')
+    ext.set('mod_id', 'irisvision')
+    ext.set('mod_name', 'IrisVision')
+    ext.set('mod_license', 'Custom - attribution required')
+    ext.set('mod_version', '1.0.0')
+    ext.set('mod_group_id', 'net.opal.irisvision')
+}
+evaluationDependsOn(':irisVision')
 
 neoForge {
     // Specify the version of NeoForge to use.
@@ -97,6 +113,9 @@ neoForge {
         "${mod_id}" {
             sourceSet(sourceSets.main)
         }
+        irisvision {
+            sourceSet(project(':irisVision').sourceSets.main)
+        }
     }
 
     unitTest {
@@ -140,6 +159,13 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+}
+
+tasks.matching { it.name.startsWith('run') }.configureEach {
+    dependsOn(project(':irisVision').tasks.named('classes'))
+}
+project(':irisVision').tasks.matching { it.name.startsWith('run') }.configureEach {
+    enabled = false
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

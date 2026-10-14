@@ -1,4 +1,4 @@
-# IrisV mod compatibility (client API)
+# Iris mod compatibility (client API)
 
 This is an extension foundation, not automatic support for every machine.
 Vanilla integration stays built in. Custom recipes exposed through Minecraft's
@@ -7,8 +7,8 @@ energy displays and machine-specific preview layouts are not supplied by this AP
 
 ## Registration
 
-Implement `net.opal.irisv.api.compat.RecipeIntegration` and call
-`IrisVCompatibility.register(adapter)` during client setup using `enqueueWork`.
+Implement `net.opal.iris.api.compat.RecipeIntegration` and call
+`IrisCompatibility.register(adapter)` during client setup using `enqueueWork`.
 Never reference this client-only API from a dedicated server entry point.
 Register optional integrations only when their target mod is loaded; isolate
 references to optional mod classes in that integration's client class.
@@ -29,9 +29,9 @@ large windows: extremely wide machine screens may leave too little side space.
 3. Implement read-only `canTransfer`: quantities, compatible slots, capacity,
    machine restrictions and availability of a server-validated transfer protocol.
 4. Implement `transfer(screen, recipe, fillAll)` to issue that protocol's request.
-   Return true only when a request was issued. IrisV then returns to the machine.
+   Return true only when a request was issued. Iris then returns to the machine.
 
-Defaults deny recipe transfers. IrisV checks that the original menu is still
+Defaults deny recipe transfers. Iris checks that the original menu is still
 the player's active menu, is valid, and has an empty cursor before delegation.
 The adapter must revalidate before sending and the server MUST independently
 validate recipe identity, menu identity, permissions, ingredients and capacity.

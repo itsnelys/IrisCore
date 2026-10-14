@@ -1,4 +1,4 @@
-# IrisV
+# Iris
 
 Catalogue d'objets, recettes, favoris et informations en jeu pour Minecraft.
 
@@ -10,7 +10,7 @@ Catalogue d'objets, recettes, favoris et informations en jeu pour Minecraft.
 
 ### Présentation
 
-IrisV rassemble les outils nécessaires pour consulter les objets, comprendre leurs recettes et préparer une fabrication sans quitter l'interface du jeu. Le mod associe un catalogue d'inventaire à des favoris, des tooltips et des indicateurs HUD configurables.
+Iris rassemble les outils nécessaires pour consulter les objets, comprendre leurs recettes et préparer une fabrication sans quitter l'interface du jeu. Le mod associe un catalogue d'inventaire à des favoris, des tooltips et des indicateurs HUD configurables.
 
 Première release : **v1 (1.0.0)**. La compilation et les tests automatisés ne remplacent pas les essais en jeu, notamment en multijoueur et avec des machines ajoutées par d'autres mods.
 
@@ -36,10 +36,10 @@ Les interactions et raccourcis sont documentés dans le Wiki en jeu. Les touches
 
 1. Préparer une instance **Minecraft 1.21.1 avec NeoForge 21.1.248** et Java 21.
 2. Compiler le projet ou utiliser un JAR obtenu auprès d'une source autorisée.
-3. Placer `irisv-1.0.1.jar` dans le dossier `mods` de l'instance.
-4. Lancer le jeu et ouvrir **IrisV Options** depuis le menu principal.
+3. Placer `iris-1.0.1.jar` dans le dossier `mods` de l'instance.
+4. Lancer le jeu et ouvrir **Iris Options** depuis le menu principal.
 
-Pour une installation multijoueur, prévoir IrisV sur le client et le serveur : le mod déclare un canal réseau pour les données des tooltips. Ne pas le considérer comme un mod exclusivement client.
+Pour une installation multijoueur, prévoir Iris sur le client et le serveur : le mod déclare un canal réseau pour les données des tooltips. Ne pas le considérer comme un mod exclusivement client.
 
 ### Développement
 
@@ -51,7 +51,7 @@ Depuis la racine du dépôt, dans PowerShell :
 .\gradlew.bat build
 ```
 
-Le build compile le code et exécute les tests. Le JAR est produit dans `build/libs/irisv-1.0.1.jar` ; son nom suit `mod_id` et `mod_version` dans `gradle.properties`.
+Le build compile le code et exécute les tests. Le JAR est produit dans `build/libs/iris-1.0.1.jar` ; son nom suit `mod_id` et `mod_version` dans `gradle.properties`.
 
 | Commande PowerShell | Usage |
 | --- | --- |
@@ -69,14 +69,14 @@ Les chemins suivants sont relatifs au dossier de l'instance Minecraft, soit `run
 
 | Fichier | Contenu |
 | --- | --- |
-| `config/irisv/options.json` | Options, favoris et classement |
-| `config/irisv/irisv-settings.json` | Fichier d'échange des réglages |
-| `config/irisv/options.before-import.json` | Sauvegarde complète créée avant un import |
+| `config/iris/options.json` | Options, favoris et classement |
+| `config/iris/iris-settings.json` | Fichier d'échange des réglages |
+| `config/iris/options.before-import.json` | Sauvegarde complète créée avant un import |
 | `logs/latest.log` | Journal du jeu et erreurs détaillées |
 
 **Diagnostic et réglages** est accessible depuis les options générales et le Wiki. L'import demande confirmation et conserve les favoris. Le fichier de sauvegarde, contrairement au fichier d'export, contient les favoris personnels. Les textes de recherche ne sont pas sauvegardés et les touches Minecraft ne sont pas incluses dans l'export.
 
-L'option **Debug Chat** active les messages locaux d'IrisV, avec limitation des doublons. Les erreurs techniques détaillées restent dans `latest.log`.
+L'option **Debug Chat** active les messages locaux d'Iris, avec limitation des doublons. Les erreurs techniques détaillées restent dans `latest.log`.
 
 ### Compatibilité Et Limites
 
@@ -96,7 +96,7 @@ Projet propriétaire, copyright © 2026 itsnelys. Aucune autorisation de copie, 
 
 ### Overview
 
-IrisV combines an inventory catalogue, recipe browsing, favorites, tooltips and configurable HUD indicators to help players inspect items and prepare crafting without leaving the game interface.
+Iris combines an inventory catalogue, recipe browsing, favorites, tooltips and configurable HUD indicators to help players inspect items and prepare crafting without leaving the game interface.
 
 First release: **v1 (1.0.0)**, targeting **Minecraft 1.21.1, NeoForge 21.1.248 and Java 21**. The target is defined in `gradle.properties`, regardless of the local directory name. Successful builds and automated tests do not guarantee every multiplayer or modded-machine workflow.
 
@@ -118,9 +118,9 @@ See the in-game Wiki for interactions and shortcuts. Configurable keys appear in
 
 ### Installation And Build
 
-Use a Minecraft 1.21.1 instance with NeoForge 21.1.248 and Java 21. Build the project or obtain an authorized JAR, then place it in the instance's `mods` folder. Open **IrisV Options** from the main menu.
+Use a Minecraft 1.21.1 instance with NeoForge 21.1.248 and Java 21. Build the project or obtain an authorized JAR, then place it in the instance's `mods` folder. Open **Iris Options** from the main menu.
 
-For multiplayer, plan to install IrisV on both client and server: the mod registers a network channel for tooltip data. It should not be treated as client-only.
+For multiplayer, plan to install Iris on both client and server: the mod registers a network channel for tooltip data. It should not be treated as client-only.
 
 Build from the repository root:
 
@@ -128,7 +128,7 @@ Build from the repository root:
 .\gradlew.bat build
 ```
 
-The wrapper supplies Gradle 9.2.1. The first run requires network access to download dependencies and Minecraft resources. Output: `build/libs/irisv-1.0.1.jar`; the filename follows `mod_id` and `mod_version`.
+The wrapper supplies Gradle 9.2.1. The first run requires network access to download dependencies and Minecraft resources. Output: `build/libs/iris-1.0.1.jar`; the filename follows `mod_id` and `mod_version`.
 
 Use `runClient` or `runServer` for development, `test` for automated tests, and `runData` for data generation. On Linux/macOS, use `./gradlew` instead of `.\gradlew.bat`. Server administrators must accept Minecraft's EULA before running a server.
 
@@ -136,9 +136,9 @@ Use `runClient` or `runServer` for development, `test` for automated tests, and 
 
 Paths are relative to the game directory (`run/` for default development launches):
 
-- `config/irisv/options.json`: settings, favorites and ordering.
-- `config/irisv/irisv-settings.json`: settings exchange file.
-- `config/irisv/options.before-import.json`: full pre-import backup, including private favorites.
+- `config/iris/options.json`: settings, favorites and ordering.
+- `config/iris/iris-settings.json`: settings exchange file.
+- `config/iris/options.before-import.json`: full pre-import backup, including private favorites.
 - `logs/latest.log`: detailed logs and errors.
 
 Open **Diagnostics & settings** from General options or the Wiki. Imports require confirmation and preserve favorites. Search text is not persisted; Minecraft key bindings are not exported. **Debug Chat** enables local action messages with duplicate throttling.
@@ -150,7 +150,7 @@ Technical documentation: [Compatibility API](docs/mod-compatibility.md) · [Wiki
 ### Repository Layout
 
 ```text
-src/main/java/net/opal/irisv/   Mod code, UI, recipes, networking and compatibility API
+src/main/java/net/opal/iris/   Mod code, UI, recipes, networking and compatibility API
 src/main/resources/           Textures, translations and mixin configuration
 src/main/templates/           Generated mod metadata template
 src/test/java/                Automated tests

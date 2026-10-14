@@ -1,6 +1,6 @@
 # Wiki, diagnostics and settings exchange
 
-Open **Diagnostics & settings** from the Wiki or the General section of IrisV Options.
+Open **Diagnostics & settings** from the Wiki or the General section of Iris Options.
 
 ## Wiki search
 
@@ -18,14 +18,14 @@ game log. The page does not execute recipe transfers or probe inventories.
 
 ## Settings exchange
 
-- Export writes `config/irisv/irisv-settings.json` (confirmation before replacement).
+- Export writes `config/iris/iris-settings.json` (confirmation before replacement).
 - Import reads that same file after confirmation. Open folder locates it.
-- The document identifies format `irisv-settings`, version `1`, and a settings object.
+- The document identifies format `iris-settings`, version `1`, and a settings object.
 - Invalid types, unknown settings, invalid enums and unsupported versions are rejected.
 - Partial imports retain settings not specified in the document.
 - Favorites, exact recipe bookmarks, favorite order/filter and catalogue navigation
   state are excluded from export and ignored if supplied during import.
-- Minecraft key bindings are not part of IrisV's settings file.
+- Minecraft key bindings are not part of Iris's settings file.
 - Before import, the full current config is backed up to `options.before-import.json`.
   This backup includes personal favorites; unlike the export, it is not intended for sharing.
 - Settings are written through a temporary file and atomic replacement where supported.
