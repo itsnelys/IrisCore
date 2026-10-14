@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShieldItem;
 import net.opal.iris.api.IIndicator;
 import net.opal.iris.option.ConfigOptions;
 
@@ -71,6 +72,15 @@ public class ToolDurabilityIndicator implements IIndicator {
             float time = (mc.player.tickCount + partialTick) * speed;
             float alphaPulse = 0.5F + (float) Math.sin(time) * 0.35F;
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alphaPulse);
+
+            // Shield models ignore the global shader alpha on this render path.
+            // Hide the full entry during the low half of this same pulse so a
+            // shield in hand and a BackItem shield flash in sync with all icons.
+            if (stack.getItem() instanceof ShieldItem && alphaPulse < 0.5F) {
+                gui.flush();
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                return y + 18;
+            }
         }
 
         gui.renderItem(stack, x, y);
