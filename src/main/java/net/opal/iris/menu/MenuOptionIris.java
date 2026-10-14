@@ -66,11 +66,9 @@ public final class MenuOptionIris extends Screen {
             config.save();
         }).tooltip(tooltip("menu.iris.tooltip.side")).bounds(left + halfWidth + BUTTON_GAP, 135, halfWidth, BUTTON_HEIGHT).build());
 
-        addRenderableWidget(Button.builder(backItemsText(config.enableBackItems), button -> {
-            config.enableBackItems = !config.enableBackItems;
-            button.setMessage(backItemsText(config.enableBackItems));
-            config.save();
-        }).tooltip(tooltip("menu.iris.tooltip.back_items")).bounds(left, 160, width, BUTTON_HEIGHT).build());
+        addRenderableWidget(Button.builder(Component.translatable("menu.iris.back_items.configure"), button ->
+                this.minecraft.setScreen(new BackItemsOptionsScreen(this)))
+                .tooltip(tooltip("menu.iris.tooltip.back_items")).bounds(left, 160, width, BUTTON_HEIGHT).build());
 
         for (IrisModuleOptionsRegistry.Entry entry : IrisModuleOptionsRegistry.entries()) {
             Button button = Button.builder(entry.title(), ignored -> this.minecraft.setScreen(entry.screenFactory().apply(this)))
@@ -192,10 +190,6 @@ public final class MenuOptionIris extends Screen {
     private static Component sideText(ConfigOptions.IndicatorPosition position) {
         String key = position == ConfigOptions.IndicatorPosition.LEFT ? "menu.iris.left" : "menu.iris.right";
         return Component.translatable("menu.iris.side", colored(UiTheme.getCurrent().gui_valColor(), Component.translatable(key)));
-    }
-
-    private static Component backItemsText(boolean enabled) {
-        return Component.translatable("menu.iris.back_items", state(enabled));
     }
 
     private static Component state(boolean enabled) {
