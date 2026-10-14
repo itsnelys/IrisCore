@@ -35,6 +35,10 @@ public class ConfigOptions {
     public boolean enableBackItems = true;
     /** Extra item ids allowed as BackItems, for example "modid:greatsword". */
     public List<String> backItemWhitelist = new ArrayList<>();
+    public boolean hideBackItemsInFirstPerson = true;
+    public boolean hideBackItemsWhileSwimming = true;
+    public boolean hideBackItemsWhileFallFlying = true;
+    public boolean hideBackItemsWhenInvisible = true;
     public boolean enableToolDurabilityIndicator = true;
     public boolean showDurabilityDetails = true;
     public IndicatorPosition indicatorPosition = IndicatorPosition.RIGHT;
@@ -128,6 +132,10 @@ public class ConfigOptions {
         options.enableIndicators = readBoolean(root, "enableIndicators", options.enableIndicators);
         options.enableBackItems = readBoolean(root, "enableBackItems", options.enableBackItems);
         options.backItemWhitelist = readStringList(root, "backItemWhitelist");
+        options.hideBackItemsInFirstPerson = readBoolean(root, "hideBackItemsInFirstPerson", options.hideBackItemsInFirstPerson);
+        options.hideBackItemsWhileSwimming = readBoolean(root, "hideBackItemsWhileSwimming", options.hideBackItemsWhileSwimming);
+        options.hideBackItemsWhileFallFlying = readBoolean(root, "hideBackItemsWhileFallFlying", options.hideBackItemsWhileFallFlying);
+        options.hideBackItemsWhenInvisible = readBoolean(root, "hideBackItemsWhenInvisible", options.hideBackItemsWhenInvisible);
         options.enableToolDurabilityIndicator = readBoolean(root, "enableToolDurabilityIndicator", options.enableToolDurabilityIndicator);
         options.showDurabilityDetails = readBoolean(root, "showDurabilityDetails", options.showDurabilityDetails);
         options.enableEntityTooltip = readBoolean(root, "enableEntityTooltip", options.enableEntityTooltip);
@@ -164,6 +172,10 @@ public class ConfigOptions {
         JsonArray backItems = new JsonArray();
         for (String itemId : backItemWhitelist) backItems.add(itemId);
         root.add("backItemWhitelist", backItems);
+        root.addProperty("hideBackItemsInFirstPerson", hideBackItemsInFirstPerson);
+        root.addProperty("hideBackItemsWhileSwimming", hideBackItemsWhileSwimming);
+        root.addProperty("hideBackItemsWhileFallFlying", hideBackItemsWhileFallFlying);
+        root.addProperty("hideBackItemsWhenInvisible", hideBackItemsWhenInvisible);
         root.addProperty("enableToolDurabilityIndicator", enableToolDurabilityIndicator);
         root.addProperty("showDurabilityDetails", showDurabilityDetails);
         root.addProperty("indicatorPosition", indicatorPosition.name());

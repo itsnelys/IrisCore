@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.world.item.ItemStack;
+import net.opal.iris.option.ConfigOptions;
 
 public final class BackItemLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     public BackItemLayer(RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> parent) {
@@ -35,9 +36,10 @@ public final class BackItemLayer extends RenderLayer<AbstractClientPlayer, Playe
     /** Hides only the visual layer; the selected BackItem and its protection stay intact. */
     private static boolean isHiddenByContext(AbstractClientPlayer player) {
         Minecraft minecraft = Minecraft.getInstance();
-        return minecraft.options.getCameraType().isFirstPerson()
-                || player.isSwimming()
-                || player.isFallFlying()
-                || player.isInvisible();
+        ConfigOptions config = ConfigOptions.getInstance();
+        return (config.hideBackItemsInFirstPerson && minecraft.options.getCameraType().isFirstPerson())
+                || (config.hideBackItemsWhileSwimming && player.isSwimming())
+                || (config.hideBackItemsWhileFallFlying && player.isFallFlying())
+                || (config.hideBackItemsWhenInvisible && player.isInvisible());
     }
 }
