@@ -20,8 +20,8 @@ import java.util.UUID;
 /** Server-side rear-only shield blocking for an eligible shield displayed as a BackItem. */
 public final class BackShieldProtection {
     private static final double REAR_BLOCK_DOT_PRODUCT = -0.5D;
-    /** Matches the minimum one-point durability loss applied to a vanilla armor hit. */
-    private static final int ARMOR_LIKE_DURABILITY_COST = 1;
+    /** Back protection is passive, so each armor-timed block costs three durability points. */
+    private static final int BACK_SHIELD_DURABILITY_COST = 3;
     private static final Map<UUID, ItemStack> LOCKED_SHIELDS = new HashMap<>();
 
     private BackShieldProtection() {}
@@ -60,7 +60,7 @@ public final class BackShieldProtection {
         event.setCanceled(true);
         if (player.invulnerableTime > 0) return;
 
-        shield.hurtAndBreak(ARMOR_LIKE_DURABILITY_COST, player, net.minecraft.world.entity.EquipmentSlot.OFFHAND);
+        shield.hurtAndBreak(BACK_SHIELD_DURABILITY_COST, player, net.minecraft.world.entity.EquipmentSlot.OFFHAND);
         player.invulnerableTime = player.invulnerableDuration;
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 1.0F, 0.8F);
