@@ -20,6 +20,11 @@ import java.util.UUID;
 /** Server-side rear-only shield blocking for an eligible shield displayed as a BackItem. */
 public final class BackShieldProtection {
     private static final double REAR_BLOCK_DOT_PRODUCT = -0.5D;
+    /**
+     * A back shield has no active-use delay, so it costs more than a normal shield
+     * block. ItemStack.hurtAndBreak still applies Minecraft's Unbreaking handling.
+     */
+    private static final int BACK_SHIELD_DURABILITY_COST = 3;
     private static final Map<UUID, ItemStack> LOCKED_SHIELDS = new HashMap<>();
 
     private BackShieldProtection() {}
@@ -54,12 +59,13 @@ public final class BackShieldProtection {
         if (attacker == null || attacker == player || !isBehind(player, attacker)) return;
 
         event.setCanceled(true);
-        shield.hurtAndBreak(1, player, net.minecraft.world.entity.EquipmentSlot.OFFHAND);
-        LOCKED_SHIELDS.remove(player.getUUID());
-        PacketDistributor.sendToPlayer(player, new BackItemDetachPayload());
+        shield.hurtAndBreak(BACK_SHIELD_DURABILITY_COST, player, net.minecraft.world.entity.EquipmentSlot.OFFHAND);
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 1.0F, 0.8F);
-        if (shield.isEmpty()) LOCKED_SHIELDS.remove(player.getUUID());
+        if (shield.isEmpty()) {
+            LOCKED_SHIELDS.remove(player.getUUID());
+            PacketDistributor.sendToPlayer(player, new BackItemDetachPayload());
+        }
     }
 
     private static boolean isBehind(ServerPlayer player, Entity attacker) {
