@@ -19,6 +19,7 @@ Les fonctionnalités spécialisées — recettes, catalogue, recherche d'inventa
 - Objet tenu précédemment rendu dans le dos : armes, outils, arc, arbalète, bouclier, trident et masse. L'affichage se met à jour quand l'objet est retiré de l'inventaire.
 - Visibilité contextuelle des objets dorsaux : masqués visuellement en nage, en élytra, invisible et en première personne.
 - Ces masquages se règlent dans `config/iris/options.json` avec `hideBackItemsInFirstPerson`, `hideBackItemsWhileSwimming`, `hideBackItemsWhileFallFlying` et `hideBackItemsWhenInvisible`.
+- Options supplémentaires désactivées par défaut : `hideBackItemsWhileCrouching`, `hideBackItemsWhileRiding`, `hideBackItemsInSpectator`, `hideBackItemsWhileSleeping` et `hideBackItemsWithCape`.
 - Objets moddés : ajoutez leurs identifiants à `backItemWhitelist` dans `config/iris/options.json`, par exemple `["modid:greatsword", "modid:warhammer"]`.
 - Migration sûre des anciens réglages `irisv` vers `iris`.
 
@@ -53,6 +54,7 @@ Specialized features — recipes, catalogue, inventory search and tooltips — l
 - Previously held compatible item rendered on the player's back: weapons, tools, bow, crossbow, shield, trident and mace. It updates when the item leaves the inventory.
 - Contextual back-item visibility: visually hidden while swimming, using an elytra, invisible, or in first person.
 - Configure each visibility rule in `config/iris/options.json` with `hideBackItemsInFirstPerson`, `hideBackItemsWhileSwimming`, `hideBackItemsWhileFallFlying`, and `hideBackItemsWhenInvisible`.
+- Additional options disabled by default: `hideBackItemsWhileCrouching`, `hideBackItemsWhileRiding`, `hideBackItemsInSpectator`, `hideBackItemsWhileSleeping`, and `hideBackItemsWithCape`.
 - Modded items: add their ids to `backItemWhitelist` in `config/iris/options.json`, for example `["modid:greatsword", "modid:warhammer"]`.
 - Safe migration of legacy `irisv` settings to `iris`.
 

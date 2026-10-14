@@ -39,6 +39,11 @@ public class ConfigOptions {
     public boolean hideBackItemsWhileSwimming = true;
     public boolean hideBackItemsWhileFallFlying = true;
     public boolean hideBackItemsWhenInvisible = true;
+    public boolean hideBackItemsWhileCrouching = false;
+    public boolean hideBackItemsWhileRiding = false;
+    public boolean hideBackItemsInSpectator = false;
+    public boolean hideBackItemsWhileSleeping = false;
+    public boolean hideBackItemsWithCape = false;
     public boolean enableToolDurabilityIndicator = true;
     public boolean showDurabilityDetails = true;
     public IndicatorPosition indicatorPosition = IndicatorPosition.RIGHT;
@@ -136,6 +141,11 @@ public class ConfigOptions {
         options.hideBackItemsWhileSwimming = readBoolean(root, "hideBackItemsWhileSwimming", options.hideBackItemsWhileSwimming);
         options.hideBackItemsWhileFallFlying = readBoolean(root, "hideBackItemsWhileFallFlying", options.hideBackItemsWhileFallFlying);
         options.hideBackItemsWhenInvisible = readBoolean(root, "hideBackItemsWhenInvisible", options.hideBackItemsWhenInvisible);
+        options.hideBackItemsWhileCrouching = readBoolean(root, "hideBackItemsWhileCrouching", options.hideBackItemsWhileCrouching);
+        options.hideBackItemsWhileRiding = readBoolean(root, "hideBackItemsWhileRiding", options.hideBackItemsWhileRiding);
+        options.hideBackItemsInSpectator = readBoolean(root, "hideBackItemsInSpectator", options.hideBackItemsInSpectator);
+        options.hideBackItemsWhileSleeping = readBoolean(root, "hideBackItemsWhileSleeping", options.hideBackItemsWhileSleeping);
+        options.hideBackItemsWithCape = readBoolean(root, "hideBackItemsWithCape", options.hideBackItemsWithCape);
         options.enableToolDurabilityIndicator = readBoolean(root, "enableToolDurabilityIndicator", options.enableToolDurabilityIndicator);
         options.showDurabilityDetails = readBoolean(root, "showDurabilityDetails", options.showDurabilityDetails);
         options.enableEntityTooltip = readBoolean(root, "enableEntityTooltip", options.enableEntityTooltip);
@@ -176,6 +186,11 @@ public class ConfigOptions {
         root.addProperty("hideBackItemsWhileSwimming", hideBackItemsWhileSwimming);
         root.addProperty("hideBackItemsWhileFallFlying", hideBackItemsWhileFallFlying);
         root.addProperty("hideBackItemsWhenInvisible", hideBackItemsWhenInvisible);
+        root.addProperty("hideBackItemsWhileCrouching", hideBackItemsWhileCrouching);
+        root.addProperty("hideBackItemsWhileRiding", hideBackItemsWhileRiding);
+        root.addProperty("hideBackItemsInSpectator", hideBackItemsInSpectator);
+        root.addProperty("hideBackItemsWhileSleeping", hideBackItemsWhileSleeping);
+        root.addProperty("hideBackItemsWithCape", hideBackItemsWithCape);
         root.addProperty("enableToolDurabilityIndicator", enableToolDurabilityIndicator);
         root.addProperty("showDurabilityDetails", showDurabilityDetails);
         root.addProperty("indicatorPosition", indicatorPosition.name());

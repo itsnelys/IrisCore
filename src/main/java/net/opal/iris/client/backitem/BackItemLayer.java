@@ -40,6 +40,11 @@ public final class BackItemLayer extends RenderLayer<AbstractClientPlayer, Playe
         return (config.hideBackItemsInFirstPerson && minecraft.options.getCameraType().isFirstPerson())
                 || (config.hideBackItemsWhileSwimming && player.isSwimming())
                 || (config.hideBackItemsWhileFallFlying && player.isFallFlying())
-                || (config.hideBackItemsWhenInvisible && player.isInvisible());
+                || (config.hideBackItemsWhenInvisible && player.isInvisible())
+                || (config.hideBackItemsWhileCrouching && player.isCrouching())
+                || (config.hideBackItemsWhileRiding && player.isPassenger())
+                || (config.hideBackItemsInSpectator && player.isSpectator())
+                || (config.hideBackItemsWhileSleeping && player.isSleeping())
+                || (config.hideBackItemsWithCape && player.getSkin().capeTexture() != null);
     }
 }
