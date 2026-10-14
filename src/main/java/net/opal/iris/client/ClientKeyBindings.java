@@ -1,11 +1,13 @@
 package net.opal.iris.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.settings.KeyConflictContext;
+import net.neoforged.neoforge.client.settings.KeyModifier;
 import net.opal.iris.client.backitem.BackItemManager;
 import net.opal.iris.option.ConfigOptions;
 import org.lwjgl.glfw.GLFW;
@@ -14,7 +16,9 @@ import org.lwjgl.glfw.GLFW;
 public final class ClientKeyBindings {
     private static final String CATEGORY = "key.categories.iris";
     private static final KeyMapping TOGGLE_OVERLAY = new KeyMapping("key.iris.toggle_overlay", GLFW.GLFW_KEY_V, CATEGORY);
-    private static final KeyMapping LOCK_BACK_ITEM = new KeyMapping("key.iris.lock_back_item", GLFW.GLFW_KEY_B, CATEGORY);
+    private static final KeyMapping LOCK_BACK_ITEM = new KeyMapping(
+            "key.iris.lock_back_item", KeyConflictContext.IN_GAME, KeyModifier.SHIFT,
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, CATEGORY);
     public static final KeyMapping RECIPES = new KeyMapping("key.iris.recipes", GLFW.GLFW_KEY_UNKNOWN, CATEGORY);
     public static final KeyMapping USES = new KeyMapping("key.iris.uses", GLFW.GLFW_KEY_UNKNOWN, CATEGORY);
     public static final KeyMapping PIN = new KeyMapping("key.iris.pin", GLFW.GLFW_KEY_UNKNOWN, CATEGORY);
@@ -38,7 +42,7 @@ public final class ClientKeyBindings {
 
     public static void onClientTick(ClientTickEvent.Post event) {
         while (LOCK_BACK_ITEM.consumeClick()) {
-            if (Minecraft.getInstance().screen == null && Screen.hasShiftDown()) {
+            if (Minecraft.getInstance().screen == null) {
                 BackItemManager.toggleLockedMainHand();
             }
         }
