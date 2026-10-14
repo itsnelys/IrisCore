@@ -25,11 +25,8 @@ public final class BackShieldProtection {
      * block. ItemStack.hurtAndBreak still applies Minecraft's Unbreaking handling.
      */
     private static final int BACK_SHIELD_DURABILITY_COST = 3;
-    /**
-     * Mirrors Minecraft's normal post-hit invulnerability window. A mob that
-     * keeps touching the player therefore cannot drain the shield every tick.
-     */
-    private static final long BLOCK_RECOVERY_TICKS = 20L;
+    /** Prevents a cluster of entities from charging several shield blocks at once. */
+    private static final long BLOCK_RECOVERY_TICKS = 5L;
     private static final Map<UUID, ItemStack> LOCKED_SHIELDS = new HashMap<>();
     private static final Map<UUID, Long> LAST_BLOCK_TICKS = new HashMap<>();
 
