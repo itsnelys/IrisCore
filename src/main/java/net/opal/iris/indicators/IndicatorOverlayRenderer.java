@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.opal.iris.api.IIndicator;
 import net.opal.iris.indicators.providers.ArmorIndicator;
 import net.opal.iris.indicators.providers.ArrowIndicator;
+import net.opal.iris.indicators.providers.BackItemIndicator;
 import net.opal.iris.indicators.providers.ToolDurabilityIndicator;
 import net.opal.iris.option.ConfigOptions;
 
@@ -18,6 +19,7 @@ public class IndicatorOverlayRenderer {
         INDICATORS.add(new ArmorIndicator());
         INDICATORS.add(new ArrowIndicator());
         INDICATORS.add(new ToolDurabilityIndicator());
+        INDICATORS.add(new BackItemIndicator());
     }
 
     // Remplace 'float partialTick' par 'DeltaTracker deltaTracker'

@@ -100,6 +100,11 @@ public final class BackItemManager {
         return BACK_ITEMS.getOrDefault(playerId, ItemStack.EMPTY);
     }
 
+    /** Returns whether the player's displayed back item was explicitly selected with Shift+B. */
+    public static boolean isBackItemLocked(UUID playerId) {
+        return isLocked(playerId);
+    }
+
     public static void clear() {
         BACK_ITEMS.clear();
         LOCKED_BACK_ITEMS.clear();
