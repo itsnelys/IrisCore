@@ -128,7 +128,7 @@
   "menu.iris.tooltip.entities": "Active les infos sur les entités ciblées.",
   "menu.iris.tooltip.compact": "Réduit l'affichage pour prendre moins de place.",
   "menu.iris.tooltip.hud": "Active les indicateurs visuels hors inventaire.",
-  "menu.iris.tooltip.back_items": "Affiche dans le dos un outil compatible de votre inventaire, sauf s'il est tenu en main. Shift+B verrouille l'objet tenu et l'affiche dans le HUD avec un L vert.",
+  "menu.iris.tooltip.back_items": "Affiche dans le dos un outil compatible de votre inventaire, sauf s'il est tenu en main. Shift+B verrouille l'objet tenu et l'affiche dans le HUD avec sa durabilité.",
   "menu.iris.tooltip.side": "Choisit le côté d'affichage des indicateurs HUD.",
   "menu.iris.tooltip.return": "Retourne au menu précédent.",
   "menu.iris.providers.tooltip.blocks": "Affiche les informations des blocs ciblés.",

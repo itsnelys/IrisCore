@@ -65,6 +65,10 @@ public final class BackShieldProtection {
         if (shield.isEmpty()) {
             LOCKED_SHIELDS.remove(player.getUUID());
             PacketDistributor.sendToPlayer(player, new BackItemDetachPayload());
+        } else {
+            // Damage changes the stack components. Keep the server-side reference
+            // in sync so the shield can block every later rear attack too.
+            LOCKED_SHIELDS.put(player.getUUID(), shield.copy());
         }
     }
 
