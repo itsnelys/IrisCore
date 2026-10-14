@@ -58,7 +58,8 @@ public class ToolDurabilityIndicator implements IIndicator {
         return (stack.getMaxDamage() - stack.getDamageValue()) / (float) stack.getMaxDamage();
     }
 
-    private static int renderDurability(GuiGraphics gui, Minecraft mc, ItemStack stack, int x, int y, float partialTick) {
+    /** Shared by every Iris HUD location that renders an item's durability. */
+    public static int renderDurability(GuiGraphics gui, Minecraft mc, ItemStack stack, int x, int y, float partialTick) {
         if (!stack.isDamageableItem()) return y;
 
         float ratio = getDurabilityRatio(stack);
