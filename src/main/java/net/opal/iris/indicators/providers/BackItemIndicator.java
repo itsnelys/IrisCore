@@ -38,19 +38,14 @@ public final class BackItemIndicator implements IIndicator {
         if (stack.isEmpty()) return;
 
         float durabilityRatio = getDurabilityRatio(stack);
-        if (durabilityRatio <= 0.10F) {
-            gui.flush();
-            float speed = durabilityRatio <= 0.05F ? 1.2F : 0.6F;
-            float time = (player.tickCount + partialTick) * speed;
-            float alpha = 0.5F + (float) Math.sin(time) * 0.35F;
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
-            gui.renderItem(stack, x, y);
-            gui.renderItemDecorations(minecraft.font, stack, x, y);
-        } else {
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            gui.renderItem(stack, x, y);
-            gui.renderItemDecorations(minecraft.font, stack, x, y);
-        }
+        if (durabilityRatio <= 0.10F && !isLowDurabilityVisible(player.tickCount, durabilityRatio)) return;
+
+        // ItemRenderer does not consistently honour alpha on every item model.
+        // Alternating the complete indicator guarantees the same warning is visible
+        // for shields and every other damageable BackItem.
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        gui.renderItem(stack, x, y);
+        gui.renderItemDecorations(minecraft.font, stack, x, y);
         gui.flush();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
@@ -80,5 +75,10 @@ public final class BackItemIndicator implements IIndicator {
     private static float getDurabilityRatio(ItemStack stack) {
         if (!stack.isDamageableItem() || stack.getMaxDamage() <= 0) return 1.0F;
         return (stack.getMaxDamage() - stack.getDamageValue()) / (float) stack.getMaxDamage();
+    }
+
+    private static boolean isLowDurabilityVisible(int tickCount, float durabilityRatio) {
+        int halfCycleTicks = durabilityRatio <= 0.05F ? 3 : 6;
+        return (tickCount / halfCycleTicks) % 2 == 0;
     }
 }
