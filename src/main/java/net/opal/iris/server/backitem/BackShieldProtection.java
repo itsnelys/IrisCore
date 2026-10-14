@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/** Server-side rear-only shield blocking for an eligible locked BackItem. */
+/** Server-side rear-only shield blocking for an eligible shield displayed as a BackItem. */
 public final class BackShieldProtection {
     private static final double REAR_BLOCK_DOT_PRODUCT = -0.5D;
     private static final Map<UUID, ItemStack> LOCKED_SHIELDS = new HashMap<>();

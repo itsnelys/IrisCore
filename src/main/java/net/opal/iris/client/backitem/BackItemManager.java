@@ -41,7 +41,6 @@ public final class BackItemManager {
             ItemStack lockedBackItem = LOCKED_BACK_ITEMS.get(player.getUUID());
             if (sameStack(displayedBackItem, lockedBackItem)) {
                 LOCKED_BACK_ITEMS.remove(player.getUUID());
-                PacketDistributor.sendToServer(new BackItemLockPayload(ItemStack.EMPTY));
                 FunctionUtilsChat.clientAction(player, "iris.back_items.lock_removed", displayedBackItem.getHoverName());
             }
             FunctionUtilsChat.clientAction(player, "iris.back_items.removed", displayedBackItem.getHoverName());
@@ -71,7 +70,6 @@ public final class BackItemManager {
         if (!lockedItem.isEmpty() && sameStack(lockedItem, heldItem)) {
             LOCKED_BACK_ITEMS.remove(playerId);
             setBackItem(playerId, ItemStack.EMPTY);
-            PacketDistributor.sendToServer(new BackItemLockPayload(ItemStack.EMPTY));
             FunctionUtilsChat.clientAction(player, "iris.back_items.unlocked", heldItem.getHoverName());
             return;
         }
@@ -85,13 +83,17 @@ public final class BackItemManager {
         LOCKED_BACK_ITEMS.put(playerId, lock);
         setBackItem(playerId, lock);
         observedMainHand = lock.copy();
-        PacketDistributor.sendToServer(new BackItemLockPayload(lock));
         FunctionUtilsChat.clientAction(player, "iris.back_items.locked", lock.getHoverName());
     }
 
     public static void setBackItem(UUID playerId, ItemStack stack) {
         if (stack == null || stack.isEmpty()) BACK_ITEMS.remove(playerId);
         else BACK_ITEMS.put(playerId, stack.copy());
+
+        LocalPlayer localPlayer = Minecraft.getInstance().player;
+        if (localPlayer != null && localPlayer.getUUID().equals(playerId)) {
+            PacketDistributor.sendToServer(new BackItemLockPayload(stack == null ? ItemStack.EMPTY : stack));
+        }
     }
 
     public static ItemStack getBackItem(UUID playerId) {

@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.opal.iris.Iris;
 
-/** Client request to select, or clear, the shield used for back protection. */
+/** Client sync for the item currently displayed on the local player's back. */
 public record BackItemLockPayload(ItemStack stack) implements CustomPacketPayload {
     public static final Type<BackItemLockPayload> TYPE = new Type<>(
             ResourceLocation.fromNamespaceAndPath(Iris.MODID, "back_item_lock"));
