@@ -20,18 +20,9 @@ import java.util.UUID;
 /** Server-side rear-only shield blocking for an eligible shield displayed as a BackItem. */
 public final class BackShieldProtection {
     private static final double REAR_BLOCK_DOT_PRODUCT = -0.5D;
-    /**
-     * A back shield has no active-use delay, so it costs more than a normal shield
-     * block. ItemStack.hurtAndBreak still applies Minecraft's Unbreaking handling.
-     */
-    private static final int BACK_SHIELD_DURABILITY_COST = 3;
-    /**
-     * Mirrors Minecraft's normal post-hit invulnerability window. A mob that
-     * keeps touching the player therefore cannot drain the shield every tick.
-     */
-    private static final long BLOCK_RECOVERY_TICKS = 20L;
+    /** Matches the minimum one-point durability loss applied to a vanilla armor hit. */
+    private static final int ARMOR_LIKE_DURABILITY_COST = 1;
     private static final Map<UUID, ItemStack> LOCKED_SHIELDS = new HashMap<>();
-    private static final Map<UUID, Long> LAST_BLOCK_TICKS = new HashMap<>();
 
     private BackShieldProtection() {}
 
@@ -40,7 +31,6 @@ public final class BackShieldProtection {
                 || !BackItemWhitelist.isWhitelisted(requestedStack.getItem())
                 || findInventoryStack(player, requestedStack).isEmpty()) {
             LOCKED_SHIELDS.remove(player.getUUID());
-            LAST_BLOCK_TICKS.remove(player.getUUID());
             return;
         }
         LOCKED_SHIELDS.put(player.getUUID(), requestedStack.copy());
@@ -56,7 +46,6 @@ public final class BackShieldProtection {
         ItemStack shield = findInventoryStack(player, lockedShield);
         if (shield.isEmpty()) {
             LOCKED_SHIELDS.remove(player.getUUID());
-            LAST_BLOCK_TICKS.remove(player.getUUID());
             return;
         }
         if (ItemStack.isSameItemSameComponents(player.getMainHandItem(), lockedShield)
@@ -66,18 +55,17 @@ public final class BackShieldProtection {
         if (attacker == null) attacker = event.getSource().getDirectEntity();
         if (attacker == null || attacker == player || !isBehind(player, attacker)) return;
 
+        // Match vanilla hurt timing: while the player is in their normal damage
+        // immunity window, rear hits are still stopped but do not cost durability.
         event.setCanceled(true);
-        long gameTime = player.level().getGameTime();
-        long lastBlockTick = LAST_BLOCK_TICKS.getOrDefault(player.getUUID(), -BLOCK_RECOVERY_TICKS);
-        if (gameTime - lastBlockTick < BLOCK_RECOVERY_TICKS) return;
+        if (player.invulnerableTime > 0) return;
 
-        LAST_BLOCK_TICKS.put(player.getUUID(), gameTime);
-        shield.hurtAndBreak(BACK_SHIELD_DURABILITY_COST, player, net.minecraft.world.entity.EquipmentSlot.OFFHAND);
+        shield.hurtAndBreak(ARMOR_LIKE_DURABILITY_COST, player, net.minecraft.world.entity.EquipmentSlot.OFFHAND);
+        player.invulnerableTime = player.invulnerableDuration;
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 1.0F, 0.8F);
         if (shield.isEmpty()) {
             LOCKED_SHIELDS.remove(player.getUUID());
-            LAST_BLOCK_TICKS.remove(player.getUUID());
             PacketDistributor.sendToPlayer(player, new BackItemDetachPayload());
         } else {
             // Damage changes the stack components. Keep the server-side reference
