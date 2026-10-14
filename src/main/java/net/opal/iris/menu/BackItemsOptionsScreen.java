@@ -75,6 +75,7 @@ public final class BackItemsOptionsScreen extends Screen {
 
         graphics.fill(0, 0, width, 35, theme.gui_barColor());
         graphics.fill(0, 34, width, 35, theme.gui_lineColor());
+        renderFooter(graphics, theme);
         graphics.drawCenteredString(font, Component.literal("§l").append(title), width / 2, 12, 0xFFFFFF);
         int panelWidth = Math.min(320, Math.max(180, width - 36));
         int left = (width - panelWidth) / 2;
@@ -119,5 +120,19 @@ public final class BackItemsOptionsScreen extends Screen {
     private void section(GuiGraphics graphics, UiTheme theme, String key, int x, int y, int sectionWidth) {
         graphics.drawString(font, Component.literal("§8> §7").append(Component.translatable(key)), x, y, 0xFFFFFF, true);
         graphics.fill(x, y + 13, x + sectionWidth, y + 14, theme.gui_separatorLine());
+    }
+
+    private void renderFooter(GuiGraphics graphics, UiTheme theme) {
+        int footerY = height - 40;
+        int panelWidth = Math.min(320, Math.max(180, width - 36));
+        int left = (width - panelWidth) / 2;
+        int right = left + panelWidth;
+        graphics.fill(0, footerY, left, height, theme.gui_barColor());
+        graphics.fill(0, footerY, left, footerY + 1, theme.gui_lineColor());
+        graphics.fill(right, footerY, width, height, theme.gui_barColor());
+        graphics.fill(right, footerY, width, footerY + 1, theme.gui_lineColor());
+        graphics.fill(left, footerY, right, height - 30, theme.gui_barColor());
+        graphics.fill(left, footerY, right, footerY + 1, theme.gui_lineColor());
+        graphics.fill(left, height - 10, right, height, theme.gui_barColor());
     }
 }
