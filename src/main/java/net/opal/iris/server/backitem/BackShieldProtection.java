@@ -1,0 +1,80 @@
+package net.opal.iris.server.backitem;
+
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShieldItem;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.opal.iris.client.backitem.BackItemWhitelist;
+import net.opal.iris.network.BackItemDetachPayload;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+/** Server-side rear-only shield blocking for an eligible locked BackItem. */
+public final class BackShieldProtection {
+    private static final double REAR_BLOCK_DOT_PRODUCT = -0.5D;
+    private static final Map<UUID, ItemStack> LOCKED_SHIELDS = new HashMap<>();
+
+    private BackShieldProtection() {}
+
+    public static void updateLockedShield(ServerPlayer player, ItemStack requestedStack) {
+        if (!(requestedStack.getItem() instanceof ShieldItem)
+                || !BackItemWhitelist.isWhitelisted(requestedStack.getItem())
+                || findInventoryStack(player, requestedStack).isEmpty()) {
+            LOCKED_SHIELDS.remove(player.getUUID());
+            return;
+        }
+        LOCKED_SHIELDS.put(player.getUUID(), requestedStack.copy());
+    }
+
+    @SubscribeEvent
+    public static void onIncomingDamage(LivingIncomingDamageEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+
+        ItemStack lockedShield = LOCKED_SHIELDS.get(player.getUUID());
+        if (lockedShield == null) return;
+
+        ItemStack shield = findInventoryStack(player, lockedShield);
+        if (shield.isEmpty()) {
+            LOCKED_SHIELDS.remove(player.getUUID());
+            return;
+        }
+        if (ItemStack.isSameItemSameComponents(player.getMainHandItem(), lockedShield)
+                || ItemStack.isSameItemSameComponents(player.getOffhandItem(), lockedShield)) return;
+
+        Entity attacker = event.getSource().getEntity();
+        if (attacker == null) attacker = event.getSource().getDirectEntity();
+        if (attacker == null || attacker == player || !isBehind(player, attacker)) return;
+
+        event.setCanceled(true);
+        shield.hurtAndBreak(1, player, net.minecraft.world.entity.EquipmentSlot.OFFHAND);
+        LOCKED_SHIELDS.remove(player.getUUID());
+        PacketDistributor.sendToPlayer(player, new BackItemDetachPayload());
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 1.0F, 0.8F);
+        if (shield.isEmpty()) LOCKED_SHIELDS.remove(player.getUUID());
+    }
+
+    private static boolean isBehind(ServerPlayer player, Entity attacker) {
+        Vec3 offset = attacker.position().subtract(player.position());
+        if (offset.horizontalDistanceSqr() < 0.0001D) return false;
+        Vec3 attackerDirection = new Vec3(offset.x, 0.0D, offset.z).normalize();
+        Vec3 facing = player.getLookAngle();
+        Vec3 horizontalFacing = new Vec3(facing.x, 0.0D, facing.z).normalize();
+        return horizontalFacing.dot(attackerDirection) <= REAR_BLOCK_DOT_PRODUCT;
+    }
+
+    private static ItemStack findInventoryStack(ServerPlayer player, ItemStack expected) {
+        for (ItemStack candidate : player.getInventory().items) {
+            if (candidate != null && ItemStack.isSameItemSameComponents(candidate, expected)) return candidate;
+        }
+        return ItemStack.EMPTY;
+    }
+}

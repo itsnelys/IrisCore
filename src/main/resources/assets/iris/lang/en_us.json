@@ -7,6 +7,7 @@
   "iris.back_items.unlocked": "Back item unlocked: %s",
   "iris.back_items.lock_removed": "Back item unlocked: %s is no longer in the inventory.",
   "iris.back_items.lock_invalid": "Hold an eligible weapon or tool to lock it on your back.",
+  "iris.back_items.shield_detached": "Back shield detached after blocking an attack.",
   "iris.chat.no_uses": "No uses found for %s.",
   "iris.chat.no_recipe": "No recipes found for %s.",
   "iris.chat.uses_opened": "Viewing uses of %s.",

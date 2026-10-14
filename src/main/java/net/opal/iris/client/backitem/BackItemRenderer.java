@@ -23,10 +23,12 @@ public final class BackItemRenderer {
             poseStack.translate(0.0F, 0.08F, 0.10F);
         }
         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
-        ItemDisplayContext displayContext = stack.getItem() instanceof ShieldItem
-                ? ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
-                : ItemDisplayContext.FIXED;
-        Minecraft.getInstance().getItemRenderer().renderStatic(stack, displayContext, packedLight,
+        if (stack.getItem() instanceof ShieldItem) {
+            // Keep the FIXED transform centred on the back. The third-person
+            // hand transform also moves a shield sideways toward the arm.
+            poseStack.scale(1.65F, 1.65F, 1.65F);
+        }
+        Minecraft.getInstance().getItemRenderer().renderStatic(stack, ItemDisplayContext.FIXED, packedLight,
                 OverlayTexture.NO_OVERLAY, poseStack, buffer, null, 0);
         poseStack.popPose();
     }

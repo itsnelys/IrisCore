@@ -12,6 +12,8 @@ import net.neoforged.neoforge.common.NeoForge;
 
 import net.opal.iris.option.ConfigOptions;
 import net.opal.iris.option.ConfigReloader;
+import net.opal.iris.network.IrisNetworkHandler;
+import net.opal.iris.server.backitem.BackShieldProtection;
 
 @Mod(Iris.MODID)
 public class Iris {
@@ -22,6 +24,8 @@ public class Iris {
         ConfigOptions.load();
 
         NeoForge.EVENT_BUS.addListener(ConfigReloader::register);
+        NeoForge.EVENT_BUS.register(BackShieldProtection.class);
+        modEventBus.register(IrisNetworkHandler.class);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             IrisClientEventRegistration.register(modEventBus);

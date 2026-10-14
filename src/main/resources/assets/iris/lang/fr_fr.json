@@ -7,6 +7,7 @@
   "iris.back_items.unlocked": "Objet déverrouillé du dos : %s",
   "iris.back_items.lock_removed": "Objet déverrouillé : %s n'est plus dans l'inventaire.",
   "iris.back_items.lock_invalid": "Tenez une arme ou un outil compatible pour le verrouiller dans le dos.",
+  "iris.back_items.shield_detached": "Bouclier détaché du dos après avoir bloqué une attaque.",
   "iris.chat.no_uses": "Aucune utilisation trouvée pour %s.",
   "iris.chat.no_recipe": "Aucune recette trouvée pour %s.",
   "iris.chat.uses_opened": "Consultation des utilisations de %s.",

@@ -5,7 +5,9 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.opal.iris.commun.utils.FunctionUtilsChat;
+import net.opal.iris.network.BackItemLockPayload;
 import net.opal.iris.option.ConfigOptions;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +25,9 @@ public final class BackItemManager {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null || !ConfigOptions.getInstance().enableBackItems) {
             if (player != null && !BACK_ITEMS.isEmpty()) {
+                if (isLocked(player.getUUID())) {
+                    PacketDistributor.sendToServer(new BackItemLockPayload(ItemStack.EMPTY));
+                }
                 FunctionUtilsChat.clientAction(player, "iris.back_items.disabled");
             }
             clear();
@@ -34,15 +39,16 @@ public final class BackItemManager {
         if (!displayedBackItem.isEmpty() && !isStillInInventory(player, displayedBackItem)) {
             setBackItem(player.getUUID(), ItemStack.EMPTY);
             ItemStack lockedBackItem = LOCKED_BACK_ITEMS.get(player.getUUID());
-            if (ItemStack.isSameItemSameComponents(displayedBackItem, lockedBackItem)) {
+            if (sameStack(displayedBackItem, lockedBackItem)) {
                 LOCKED_BACK_ITEMS.remove(player.getUUID());
+                PacketDistributor.sendToServer(new BackItemLockPayload(ItemStack.EMPTY));
                 FunctionUtilsChat.clientAction(player, "iris.back_items.lock_removed", displayedBackItem.getHoverName());
             }
             FunctionUtilsChat.clientAction(player, "iris.back_items.removed", displayedBackItem.getHoverName());
         }
 
         ItemStack currentMainHand = player.getMainHandItem();
-        if (ItemStack.isSameItemSameComponents(currentMainHand, observedMainHand)) return;
+        if (sameStack(currentMainHand, observedMainHand)) return;
 
         // Keep the item that was just put away. The active item is never drawn
         // on the back by the render layer, so switching tools exposes the last one.
@@ -62,9 +68,10 @@ public final class BackItemManager {
         UUID playerId = player.getUUID();
         ItemStack heldItem = player.getMainHandItem();
         ItemStack lockedItem = LOCKED_BACK_ITEMS.getOrDefault(playerId, ItemStack.EMPTY);
-        if (!lockedItem.isEmpty() && ItemStack.isSameItemSameComponents(lockedItem, heldItem)) {
+        if (!lockedItem.isEmpty() && sameStack(lockedItem, heldItem)) {
             LOCKED_BACK_ITEMS.remove(playerId);
             setBackItem(playerId, ItemStack.EMPTY);
+            PacketDistributor.sendToServer(new BackItemLockPayload(ItemStack.EMPTY));
             FunctionUtilsChat.clientAction(player, "iris.back_items.unlocked", heldItem.getHoverName());
             return;
         }
@@ -78,6 +85,7 @@ public final class BackItemManager {
         LOCKED_BACK_ITEMS.put(playerId, lock);
         setBackItem(playerId, lock);
         observedMainHand = lock.copy();
+        PacketDistributor.sendToServer(new BackItemLockPayload(lock));
         FunctionUtilsChat.clientAction(player, "iris.back_items.locked", lock.getHoverName());
     }
 
@@ -95,15 +103,30 @@ public final class BackItemManager {
         LOCKED_BACK_ITEMS.clear();
     }
 
+    /** Removes the visual lock after the server blocks an attack with the back shield. */
+    public static void detachLockedBackItemAfterBlock() {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) return;
+
+        ItemStack lockedItem = LOCKED_BACK_ITEMS.remove(player.getUUID());
+        if (lockedItem == null || lockedItem.isEmpty()) return;
+        setBackItem(player.getUUID(), ItemStack.EMPTY);
+        FunctionUtilsChat.clientAction(player, "iris.back_items.shield_detached", lockedItem.getHoverName());
+    }
+
     private static boolean isLocked(UUID playerId) {
         return LOCKED_BACK_ITEMS.containsKey(playerId);
     }
 
     private static boolean isStillInInventory(LocalPlayer player, ItemStack expected) {
         for (ItemStack candidate : player.getInventory().items) {
-            if (ItemStack.isSameItemSameComponents(candidate, expected)) return true;
+            if (sameStack(candidate, expected)) return true;
         }
-        return ItemStack.isSameItemSameComponents(player.getOffhandItem(), expected);
+        return sameStack(player.getMainHandItem(), expected) || sameStack(player.getOffhandItem(), expected);
+    }
+
+    private static boolean sameStack(ItemStack first, ItemStack second) {
+        return first != null && second != null && ItemStack.isSameItemSameComponents(first, second);
     }
 
 }
