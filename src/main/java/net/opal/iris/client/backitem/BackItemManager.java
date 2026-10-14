@@ -17,7 +17,9 @@ import java.util.UUID;
 public final class BackItemManager {
     private static final Map<UUID, ItemStack> BACK_ITEMS = new HashMap<>();
     private static final Map<UUID, ItemStack> LOCKED_BACK_ITEMS = new HashMap<>();
+    private static final Map<UUID, Integer> BACK_ITEM_SLOTS = new HashMap<>();
     private static ItemStack observedMainHand = ItemStack.EMPTY;
+    private static int observedSelectedSlot = -1;
 
     private BackItemManager() {}
 
@@ -32,6 +34,7 @@ public final class BackItemManager {
             }
             clear();
             observedMainHand = ItemStack.EMPTY;
+            observedSelectedSlot = -1;
             return;
         }
 
@@ -54,9 +57,11 @@ public final class BackItemManager {
         if (!isLocked(player.getUUID()) && !observedMainHand.isEmpty()
                 && BackItemWhitelist.isWhitelisted(observedMainHand.getItem())) {
             setBackItem(player.getUUID(), observedMainHand);
+            BACK_ITEM_SLOTS.put(player.getUUID(), observedSelectedSlot);
             FunctionUtilsChat.clientAction(player, "iris.back_items.tracked", observedMainHand.getHoverName());
         }
         observedMainHand = currentMainHand.copy();
+        observedSelectedSlot = player.getInventory().selected;
     }
 
     /** Locks or unlocks the held eligible item as the local player's preferred back item. */
@@ -82,13 +87,17 @@ public final class BackItemManager {
         ItemStack lock = heldItem.copy();
         LOCKED_BACK_ITEMS.put(playerId, lock);
         setBackItem(playerId, lock);
+        BACK_ITEM_SLOTS.put(playerId, player.getInventory().selected);
         observedMainHand = lock.copy();
+        observedSelectedSlot = player.getInventory().selected;
         FunctionUtilsChat.clientAction(player, "iris.back_items.locked", lock.getHoverName());
     }
 
     public static void setBackItem(UUID playerId, ItemStack stack) {
-        if (stack == null || stack.isEmpty()) BACK_ITEMS.remove(playerId);
-        else BACK_ITEMS.put(playerId, stack.copy());
+        if (stack == null || stack.isEmpty()) {
+            BACK_ITEMS.remove(playerId);
+            BACK_ITEM_SLOTS.remove(playerId);
+        } else BACK_ITEMS.put(playerId, stack.copy());
 
         LocalPlayer localPlayer = Minecraft.getInstance().player;
         if (localPlayer != null && localPlayer.getUUID().equals(playerId)) {
@@ -109,10 +118,11 @@ public final class BackItemManager {
 
         ItemStack trackedItem = getBackItem(player.getUUID());
         if (trackedItem.isEmpty()) return ItemStack.EMPTY;
-        if (sameTrackedItem(player.getMainHandItem(), trackedItem)) return player.getMainHandItem();
-        if (sameTrackedItem(player.getOffhandItem(), trackedItem)) return player.getOffhandItem();
-        for (ItemStack candidate : player.getInventory().items) {
-            if (sameTrackedItem(candidate, trackedItem)) return candidate;
+
+        int sourceSlot = BACK_ITEM_SLOTS.getOrDefault(player.getUUID(), -1);
+        if (sourceSlot >= 0 && sourceSlot < player.getInventory().items.size()) {
+            ItemStack sourceStack = player.getInventory().getItem(sourceSlot);
+            if (sameTrackedItem(sourceStack, trackedItem)) return sourceStack;
         }
         return trackedItem;
     }
@@ -125,6 +135,7 @@ public final class BackItemManager {
     public static void clear() {
         BACK_ITEMS.clear();
         LOCKED_BACK_ITEMS.clear();
+        BACK_ITEM_SLOTS.clear();
     }
 
     /** Removes the visual lock after the server blocks an attack with the back shield. */

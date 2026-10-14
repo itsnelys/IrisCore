@@ -24,8 +24,8 @@ public final class BackItemIndicator implements IIndicator {
         // A locked item should leave the HUD while it is actively held, just as
         // it leaves the player's back model. Automatically tracked items stay visible.
         return !BackItemManager.isBackItemLocked(player.getUUID())
-                || (!ItemStack.isSameItem(player.getMainHandItem(), stack)
-                && !ItemStack.isSameItem(player.getOffhandItem(), stack));
+                || (!ItemStack.isSameItemSameComponents(player.getMainHandItem(), stack)
+                && !ItemStack.isSameItemSameComponents(player.getOffhandItem(), stack));
     }
 
     @Override
@@ -37,13 +37,20 @@ public final class BackItemIndicator implements IIndicator {
         ItemStack stack = BackItemManager.getLiveBackItem(player);
         if (stack.isEmpty()) return;
 
-        // Isolate this indicator's render batch, otherwise alpha changes can be
-        // ignored by already queued HUD geometry.
-        gui.flush();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        renderDurabilityState(minecraft, stack, partialTick);
-        gui.renderItem(stack, x, y);
-        gui.renderItemDecorations(minecraft.font, stack, x, y);
+        float durabilityRatio = getDurabilityRatio(stack);
+        if (durabilityRatio <= 0.10F) {
+            gui.flush();
+            float speed = durabilityRatio <= 0.05F ? 1.2F : 0.6F;
+            float time = (player.tickCount + partialTick) * speed;
+            float alpha = 0.5F + (float) Math.sin(time) * 0.35F;
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
+            gui.renderItem(stack, x, y);
+            gui.renderItemDecorations(minecraft.font, stack, x, y);
+        } else {
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            gui.renderItem(stack, x, y);
+            gui.renderItemDecorations(minecraft.font, stack, x, y);
+        }
         gui.flush();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
@@ -70,15 +77,8 @@ public final class BackItemIndicator implements IIndicator {
         return 16;
     }
 
-    private static void renderDurabilityState(Minecraft minecraft, ItemStack stack, float partialTick) {
-        if (!stack.isDamageableItem() || stack.getMaxDamage() <= 0 || minecraft.player == null) return;
-
-        float ratio = (stack.getMaxDamage() - stack.getDamageValue()) / (float) stack.getMaxDamage();
-        if (ratio > 0.10F) return;
-
-        float speed = ratio <= 0.05F ? 1.2F : 0.6F;
-        float time = (minecraft.player.tickCount + partialTick) * speed;
-        float alpha = 0.5F + (float) Math.sin(time) * 0.35F;
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
+    private static float getDurabilityRatio(ItemStack stack) {
+        if (!stack.isDamageableItem() || stack.getMaxDamage() <= 0) return 1.0F;
+        return (stack.getMaxDamage() - stack.getDamageValue()) / (float) stack.getMaxDamage();
     }
 }
