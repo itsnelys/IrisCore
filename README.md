@@ -1,46 +1,5 @@
 # IrisCore
 
-**Minecraft 1.21.1 · NeoForge 21.1.248 · Java 21**
-
-[Français](#français) · [English](#english)
-
-## Français
-
-IrisCore est la base commune de la suite Iris pour Minecraft. Il fournit le HUD, les indicateurs, les raccourcis clavier, les thèmes, les options, les menus, les utilitaires de chat et de journalisation, ainsi que l'affichage du dernier outil compatible dans le dos du joueur.
-
-Les fonctionnalités spécialisées — recettes, catalogue, recherche d'inventaire et tooltips — se trouvent dans le projet compagnon [IrisVision](https://github.com/itsnelys/IrisVision).
-
-### Fonctionnalités
-
-- Menu d'options Iris extensible pour accueillir plusieurs modules.
-- Thèmes d'interface, HUD et indicateurs d'armure, de flèches et de durabilité.
-- Raccourcis configurables dans les contrôles Minecraft.
-- Messages de diagnostic facultatifs dans le chat et journaux structurés.
-- Objet tenu précédemment rendu dans le dos : armes, outils, arc, arbalète, bouclier, trident et masse. L'affichage se met à jour quand l'objet est retiré de l'inventaire.
-- Visibilité contextuelle des objets dorsaux : masqués visuellement en nage, en élytra, invisible et en première personne.
-- Ces masquages se règlent dans `config/iris/options.json` avec `hideBackItemsInFirstPerson`, `hideBackItemsWhileSwimming`, `hideBackItemsWhileFallFlying` et `hideBackItemsWhenInvisible`.
-- Options supplémentaires désactivées par défaut : `hideBackItemsWhileCrouching`, `hideBackItemsWhileRiding`, `hideBackItemsInSpectator`, `hideBackItemsWhileSleeping` et `hideBackItemsWithCape`.
-- Objets moddés : ajoutez leurs identifiants à `backItemWhitelist` dans `config/iris/options.json`, par exemple `["modid:greatsword", "modid:warhammer"]`.
-- Migration sûre des anciens réglages `irisv` vers `iris`.
-
-### Développement
-
-Depuis la racine du dépôt :
-
-```powershell
-.\gradlew.bat runClient
-.\gradlew.bat test
-.\gradlew.bat build
-```
-
-`runClient` lance IrisCore et charge IrisVision lorsque le dépôt frère `../IrisVision` est présent. Les sauvegardes et les options de développement restent dans `run/`.
-
-### Installation
-
-Utiliser Minecraft 1.21.1, NeoForge 21.1.248 et Java 21. Compiler le projet, puis placer le JAR généré dans le dossier `mods` de l'instance. Installer également IrisVision pour les recettes et les tooltips.
-
-## English
-
 IrisCore is the shared foundation of the Iris Minecraft suite. It provides the HUD, indicators, key bindings, themes, options, menus, chat and logging utilities, plus the player's compatible last-held-item back rendering.
 
 Specialized features — recipes, catalogue, inventory search and tooltips — live in the companion project [IrisVision](https://github.com/itsnelys/IrisVision).
