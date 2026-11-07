@@ -1,5 +1,12 @@
 # IrisCore
 
+
+<p align="center">
+  <img src="https://img.shields.io/badge/%F0%9F%8E%AE-Minecraft%201.21.1-4C1?style=for-the-badge" alt="🎮 Minecraft 1.21.1">
+  <img src="https://img.shields.io/badge/%E2%9A%99%EF%B8%8F-NeoForge-D44?style=for-the-badge" alt="⚙️ NeoForge">
+  <img src="https://img.shields.io/badge/%E2%98%95-Java%2021-F80?style=for-the-badge" alt="☕ Java 21">
+  <img src="https://img.shields.io/badge/%F0%9F%94%92-Proprietary-555?style=for-the-badge" alt="🔒 Proprietary">
+</p>
 IrisCore is the shared foundation of the Iris Minecraft suite. It provides the HUD, indicators, key bindings, themes, options, menus, chat and logging utilities, plus the player's compatible last-held-item back rendering.
 
 Specialized features — recipes, catalogue, inventory search and tooltips — live in the companion project [IrisVision](https://github.com/itsnelys/IrisVision).
